@@ -17,10 +17,12 @@
   "dependencies": {
     "@larksuiteoapi/node-sdk": "^1.40.1",
     "@nextui-org/react": "^2.4.8",
+    "dayjs": "^1.11.13",
     "framer-motion": "^11.11.17",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106"
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-timer-hook": "^3.0.8"
   },
   "devDependencies": {
     "@types/node": "^20",
