@@ -1,16 +1,18 @@
 import { createCalendarEvent } from '@/actions'
+import { createTimeEntries } from '@/actions/clockify'
 import { Button, Input } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useStopwatch } from 'react-timer-hook'
-export default function MyTimer({ calendarId, token }: any) {
+export default function MyTimer({ calendarId, token, workspaceId }: any) {
   const [startTime, setStartTime] = useState<any>()
+  const [clockifyStartTime, setClockifyStartTime] = useState<any>()
   const [title, setTitle] = useState('')
   const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause, reset } = useStopwatch({})
-  console.log('🚀 ~ MyTimer ~ seconds:', seconds)
   const onPauseHandle = async () => {
     pause()
     if (!startTime || !calendarId || !token) return
+    const endTime = startTime + totalSeconds + ''
     const data = await createCalendarEvent(
       {
         data: {
@@ -19,7 +21,7 @@ export default function MyTimer({ calendarId, token }: any) {
             timestamp: startTime + '',
           },
           end_time: {
-            timestamp: startTime + totalSeconds + '',
+            timestamp: endTime,
           },
         },
         path: {
@@ -28,9 +30,16 @@ export default function MyTimer({ calendarId, token }: any) {
       },
       token
     )
-    console.log('🚀 ~ onStartHandle ~ data:', data)
+    const res = await createTimeEntries(workspaceId, {
+      description: title,
+      start: clockifyStartTime,
+      end: (dayjs().format('YYYY-MM-DDTHH:mm:ssZ') as any) || undefined,
+    })
+    console.log('🚀 ~ onPauseHandle ~ data:', data)
+    console.log('🚀 ~ onPauseHandle ~ res:', res)
   }
   const onStartHandle = async () => {
+    setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'))
     setStartTime(Math.floor(dayjs().valueOf() / 1000))
     start()
   }
