@@ -11,8 +11,9 @@ export default function Home() {
   const [data, setData] = useState<Array<any>>([])
   const [list, setList] = useState({})
   const [accessToken, setAccessToken] = useState('')
-  const [userToken, setUserToken] = useState()
+  const [userToken, setUserToken] = useState('')
   const [cId, setCId] = useState('')
+  const [title, setTitle] = useState('')
   const code = useSearchParams().get('code') || ''
   const onSubmit = async () => {
     const data = await getCalendar(accessToken)
@@ -25,7 +26,7 @@ export default function Home() {
     }
   }
   const getCalendarEventsHandle = async (calendarId: string) => {
-    const res = await getCalendarEvents(calendarId)
+    const res = await getCalendarEvents(calendarId, accessToken)
     console.log('🚀 ~ getCalendarEventsHandle ~ res:', res)
     console.log('🚀 ~ getCalendarEventsHandle ~ calendarId:', calendarId)
     if (res.data?.items) {
@@ -59,8 +60,8 @@ export default function Home() {
       </div>
       <p>所有日程列表: {JSON.stringify(data)}</p>
       <p>所有日程: {JSON.stringify(list)}</p>
-      <div className='flex'>
-        <MyTimer />
+      <div className='flex flex-col'>
+        <MyTimer token={accessToken} calendarId={cId} />
       </div>
     </div>
   )

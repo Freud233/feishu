@@ -34,10 +34,9 @@ export const getCalendar = async (openId: string) => {
   }
 }
 
-export const createCalendarEvent = async (payload: any) => {
-  console.log('🚀 ~ createCalendarEvent ~ payload:', payload)
+export const createCalendarEvent = async (payload: any, token: string) => {
   try {
-    const res = await client.calendar.calendarEvent.create(payload)
+    const res = await client.calendar.calendarEvent.create(payload, lark.withUserAccessToken(token))
     console.log('🚀 ~ createCalendarEvent ~ res:', res)
     return res
   } catch (error) {
@@ -45,16 +44,19 @@ export const createCalendarEvent = async (payload: any) => {
   }
 }
 
-export const getCalendarEvents = async (calendarId: string) => {
-  const data = await client.calendar.calendarEvent
-    .list(
+export const getCalendarEvents = async (calendarId: string, token: string) => {
+  try {
+    const data = await client.calendar.calendarEvent.list(
       {
         path: {
           calendar_id: calendarId,
         },
       },
-      lark.withUserAccessToken('u-dUTDtKakB2YVxIpNvRKxP8l12W3w44t1VgG0k5uy242c')
+      lark.withUserAccessToken(token)
     )
-    
-  return data
+
+    return data
+  } catch (error) {
+    throw error
+  }
 }
