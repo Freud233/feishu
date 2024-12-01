@@ -1,10 +1,10 @@
 'use server'
 import { client } from '@/lark-sdk'
 import * as lark from '@larksuiteoapi/node-sdk'
-export const getCalendar = async (openId: string) => {
-  console.log('🚀 ~ getCalendar ~ openId:', openId)
+export const getCalendar = async (token: string) => {
+  console.log('🚀 ~ getCalendar ~ openId:', token)
   try {
-    if (!openId) return
+    if (!token) return
     // const data = await fetch('https://open.feishu.cn/open-apis/calendar/v4/calendars/primary', {
     //   method: 'POST',
     //   headers: {
@@ -19,7 +19,7 @@ export const getCalendar = async (openId: string) => {
             user_id_type: 'open_id',
           },
         },
-        lark.withUserAccessToken(`${openId}`)
+        lark.withUserAccessToken(`${token}`)
       )
       .then((res) => {
         console.log(res)
