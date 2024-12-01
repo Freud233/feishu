@@ -1,7 +1,7 @@
 'use server'
 import { client } from '@/lark-sdk'
 import * as lark from '@larksuiteoapi/node-sdk'
-export const getCalendar = async (token: string) => {
+export const getLarkCalendar = async (token: string) => {
   console.log('🚀 ~ getCalendar ~ openId:', token)
   try {
     if (!token) return

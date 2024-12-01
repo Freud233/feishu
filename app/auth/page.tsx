@@ -1,15 +1,40 @@
 'use client'
 
+import { getLarkCalendar } from '@/actions'
 import { userLogin } from '@/actions/auth'
+import { getUserInfo } from '@/actions/clockify'
+import { useClockifyStore, useLarkStore } from '@/store'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 
 const AuthPage = () => {
   const router = useRouter()
   const code = useSearchParams().get('code') || ''
+  const updateToken = useLarkStore((state: any) => state.updateToken)
+  const updateWorkspaceId = useClockifyStore((state: any) => state.updateWorkspaceId)
+  const updateClockifyUserId = useClockifyStore((state: any) => state.updateClockifyUserId)
+  const searchParams = useSearchParams()
+  const updateCalendarId = useLarkStore((state: any) => state.updateCalendarId)
+
   const onLoginHandle = async () => {
+    // 获取飞书用户信息
     const data = await userLogin(code)
     console.log('🚀 ~ onLoginHandle ~ data:', data)
+    if (data?.access_token) {
+      updateToken(data.access_token)
+      const larkCalendarData = await getLarkCalendar(data.access_token)
+      const cls = larkCalendarData?.data?.calendars
+      if (cls) {
+        const id = cls[0].calendar?.calendar_id || ''
+        updateCalendarId(id)
+      }
+    }
+
+    // 获取clockify信息
+    const clockifyData = await getUserInfo()
+    const { id, activeWorkspace } = clockifyData
+    updateWorkspaceId(activeWorkspace)
+    updateClockifyUserId(id)
   }
   useEffect(() => {
     onLoginHandle()
@@ -17,8 +42,6 @@ const AuthPage = () => {
       router.push('/')
     }, 3000)
   }, [])
-  const searchParams = useSearchParams()
-  console.log('🚀 ~ AuthPage ~ searchParams:', searchParams.get('code'))
   return <div>Auth Page</div>
 }
 export default AuthPage
