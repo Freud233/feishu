@@ -1,17 +1,33 @@
 import { create } from 'zustand'
 
-export const useLarkStore = create((set) => ({
+type ILarkStore = {
+  token: string
+  calendarId: string
+  updateToken: (token: string) => void
+  removeToken: () => void
+  updateCalendarId: (id: string) => void
+  removeCalendarId: () => void
+}
+
+type IClockifyStore = {
+  workspaceId: string
+  clockifyUserId: string
+  updateWorkspaceId: (id: string) => void
+  updateClockifyUserId: (id: string) => void
+}
+
+export const useLarkStore = create<ILarkStore>()((set) => ({
   token: '',
   calendarId: '',
-  updateToken: (newToken: string) => set({ token: newToken }),
+  updateToken: (newToken: string) => set((state) => ({ ...state, token: newToken })),
   removeToken: () => set({ token: '' }),
-  updateCalendarId: (newId: string) => set({ calendarId: newId }),
+  updateCalendarId: (newId: string) => set((state) => ({ ...state, calendarId: newId })),
   removeCalendarId: () => set({ calendarId: '' }),
 }))
 
-export const useClockifyStore = create((set) => ({
+export const useClockifyStore = create<IClockifyStore>()((set) => ({
   workspaceId: '',
   clockifyUserId: '',
-  updateWorkspaceId: (newId: string) => set({ workspaceId: newId }),
-  updateClockifyUserId: (id: string) => set({ clockifyUserId: id }),
+  updateWorkspaceId: (newId: string) => set((state) => ({ ...state, workspaceId: newId })),
+  updateClockifyUserId: (id: string) => set((state) => ({ ...state, clockifyUserId: id })),
 }))

@@ -52,3 +52,13 @@ export const createTimeEntries = async (workspaceId: string, payload?: Partial<I
   })
   return data
 }
+
+/**
+ * Get all projects on workspace
+ * */
+export const getAllProject = async (workspaceId: string) => {
+  if (!workspaceId) return
+  const { data } = await axiosInstance.get(`/v1/workspaces/${workspaceId}/projects`)
+  console.log('🚀 ~ getAllProject ~ data:', data)
+  return data
+}
