@@ -1,3 +1,4 @@
+import { IClockifyProject } from '@/type'
 import { create } from 'zustand'
 
 type ILarkStore = {
@@ -12,8 +13,10 @@ type ILarkStore = {
 type IClockifyStore = {
   workspaceId: string
   clockifyUserId: string
+  projectData: IClockifyProject[]
   updateWorkspaceId: (id: string) => void
   updateClockifyUserId: (id: string) => void
+  updateProjectData: (newArr: IClockifyProject[]) => void
 }
 
 export const useLarkStore = create<ILarkStore>()((set) => ({
@@ -28,6 +31,8 @@ export const useLarkStore = create<ILarkStore>()((set) => ({
 export const useClockifyStore = create<IClockifyStore>()((set) => ({
   workspaceId: '',
   clockifyUserId: '',
+  projectData: [],
   updateWorkspaceId: (newId: string) => set((state) => ({ ...state, workspaceId: newId })),
   updateClockifyUserId: (id: string) => set((state) => ({ ...state, clockifyUserId: id })),
+  updateProjectData: (newArr: IClockifyProject[]) => set((state) => ({ ...state, projectData: newArr })),
 }))

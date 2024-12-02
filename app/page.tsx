@@ -4,7 +4,8 @@ import { createTimeEntries, getAllProject, getTimeEntries } from '@/actions/cloc
 import MyTimer from '@/components/MyTimer'
 import { LARK_LOGIN_URL } from '@/constants'
 import { useClockifyStore, useLarkStore } from '@/store'
-import { Button } from '@nextui-org/react'
+import { IClockifyProject } from '@/type'
+import { Button, Select, SelectItem } from '@nextui-org/react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -12,7 +13,9 @@ export default function Home() {
   const [data, setData] = useState<Array<any>>([])
   const [list, setList] = useState({})
   const { token, calendarId, updateCalendarId } = useLarkStore()
-  const { workspaceId, clockifyUserId } = useClockifyStore()
+  const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
+  const [projectId, setProjectId] = useState<any>()
+  const [color, setColor] = useState(0)
   const onGetLarkCalendarHandle = async () => {
     const data = await getLarkCalendar(token)
     const cls = data?.data?.calendars
@@ -33,6 +36,47 @@ export default function Home() {
   const onGetAllProjectHandle = async () => {
     const data = await getAllProject(workspaceId)
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data)
+    updateProjectData(data)
+  }
+  function hexToRgbInt32(hex: string) {
+    // 去掉前导的 '#'
+    hex = hex.slice(1)
+
+    // 解析 RGB 分量
+    const r = parseInt(hex.slice(0, 2), 16)
+    const g = parseInt(hex.slice(2, 4), 16)
+    const b = parseInt(hex.slice(4, 6), 16)
+
+    // 组合成一个 32 位的整数（在 JavaScript 中是 Number 类型）
+    // 注意：这里我们实际上只使用了低 24 位，因为 RGB 只有 24 位
+    const rgbInt32 = (r << 16) | (g << 8) | b
+
+    return rgbInt32
+  }
+  const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
+    return (
+      <>
+        <Select
+          label='项目'
+          color='success'
+          selectedKeys={[projectId]}
+          className='max-w-xl'
+          onSelectionChange={(e) => {
+            console.log(e.currentKey)
+            const colorArr = data.filter((i) => {
+              if (i.id == e.currentKey) {
+                return i.color
+              }
+            })
+            setColor(hexToRgbInt32(colorArr[0].color))
+            setProjectId(e.currentKey)
+          }}>
+          {data.map((item) => (
+            <SelectItem key={item.id}>{item.name}</SelectItem>
+          ))}
+        </Select>
+      </>
+    )
   }
   return (
     <div className='p-2'>
@@ -55,8 +99,9 @@ export default function Home() {
       <div>日历ID: {calendarId}</div>
       <div>工作区ID: {workspaceId}</div>
       <div>clockify用户ID: {clockifyUserId}</div>
-      <div className='flex flex-col'>
-        <MyTimer token={token} calendarId={calendarId} workspaceId={workspaceId} />
+      <div className='flex gap-2 rounded-xl p-2 bg-red-100'>
+        <MyTimer token={token} calendarId={calendarId} workspaceId={workspaceId} projectId={projectId} color={color} />
+        {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
       </div>
     </div>
   )

@@ -40,3 +40,57 @@ export interface ICustomField {
     sourceType:    string;
     value:         string;
 }
+
+export interface IClockifyProject {
+  id: string
+  name: string
+  hourlyRate: HourlyRate
+  clientId: string
+  workspaceId: string
+  billable: boolean
+  memberships: Membership[]
+  color: string
+  estimate: Estimate
+  archived: boolean
+  duration: string
+  clientName: string
+  note: string
+  costRate: CostRate
+  timeEstimate: TimeEstimate
+  budgetEstimate: any
+  estimateReset: any
+  template: boolean
+  public: boolean
+}
+
+export interface HourlyRate {
+  amount: number
+  currency: string
+}
+
+export interface Membership {
+  userId: string
+  hourlyRate: any
+  costRate: any
+  targetId: string
+  membershipType: string
+  membershipStatus: string
+}
+
+export interface Estimate {
+  estimate: string
+  type: string
+}
+
+export interface CostRate {
+  amount: number
+  currency: string
+}
+
+export interface TimeEstimate {
+  estimate: string
+  type: string
+  resetOption: any
+  active: boolean
+  includeNonBillable: boolean
+}
