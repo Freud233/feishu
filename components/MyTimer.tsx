@@ -18,7 +18,7 @@ export default function MyTimer({
   color: number
 }) {
   const [startTime, setStartTime] = useState<number>()
-  const [clockifyStartTime, setClockifyStartTime] = useState<number>()
+  const [clockifyStartTime, setClockifyStartTime] = useState('')
   const [title, setTitle] = useState('')
   const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({})
   const onPauseHandle = async () => {
@@ -45,7 +45,7 @@ export default function MyTimer({
     )
     const res = await createTimeEntries(workspaceId, {
       description: title,
-      start: clockifyStartTime as any,
+      start: clockifyStartTime,
       projectId,
       end: (dayjs().format('YYYY-MM-DDTHH:mm:ssZ') as any) || undefined,
     })

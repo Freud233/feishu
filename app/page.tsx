@@ -14,7 +14,7 @@ export default function Home() {
   // const [list, setList] = useState({})
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
-  const [projectId, setProjectId] = useState<any>()
+  const [projectId, setProjectId] = useState<string>('')
   const [color, setColor] = useState(0)
   const onGetLarkCalendarHandle = async () => {
     const data = await getLarkCalendar(token)
@@ -69,7 +69,7 @@ export default function Home() {
               }
             })
             setColor(hexToRgbInt32(colorArr[0]?.color) || 0)
-            setProjectId(e.currentKey)
+            setProjectId(e.currentKey || '')
           }}>
           {data.map((item) => (
             <SelectItem key={item.id}>{item.name}</SelectItem>

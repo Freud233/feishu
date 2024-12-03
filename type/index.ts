@@ -21,9 +21,9 @@ export interface ICrateClockifyTimeEntry {
     customAttributes: ICustomAttribute[];
     customFields:     ICustomField[];
     description:      string;
-    end:              Date;
+    end:              number;
     projectId:        string;
-    start:            Date;
+    start:            string;
     tagIds:           string[];
     taskId:           string;
     type:             string;
