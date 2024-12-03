@@ -4,9 +4,21 @@ import { Button, Input } from '@nextui-org/react'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useStopwatch } from 'react-timer-hook'
-export default function MyTimer({ calendarId, token, workspaceId, projectId, color }: any) {
-  const [startTime, setStartTime] = useState<any>()
-  const [clockifyStartTime, setClockifyStartTime] = useState<any>()
+export default function MyTimer({
+  calendarId,
+  token,
+  workspaceId,
+  projectId,
+  color,
+}: {
+  calendarId: string
+  token: string
+  workspaceId: string
+  projectId: string
+  color: number
+}) {
+  const [startTime, setStartTime] = useState<number>()
+  const [clockifyStartTime, setClockifyStartTime] = useState<number>()
   const [title, setTitle] = useState('')
   const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({})
   const onPauseHandle = async () => {
@@ -33,7 +45,7 @@ export default function MyTimer({ calendarId, token, workspaceId, projectId, col
     )
     const res = await createTimeEntries(workspaceId, {
       description: title,
-      start: clockifyStartTime,
+      start: clockifyStartTime as any,
       projectId,
       end: (dayjs().format('YYYY-MM-DDTHH:mm:ssZ') as any) || undefined,
     })

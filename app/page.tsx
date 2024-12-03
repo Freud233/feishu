@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Home() {
-  const [data, setData] = useState<Array<any>>([])
+  // const [data, setData] = useState<ILarkUserInfo[]>([])
   // const [list, setList] = useState({})
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
@@ -20,7 +20,7 @@ export default function Home() {
     const data = await getLarkCalendar(token)
     const cls = data?.data?.calendars
     if (cls) {
-      setData(cls)
+      // setData(cls)
       const id = cls[0].calendar?.calendar_id || ''
       updateCalendarId(id)
     }
@@ -92,7 +92,7 @@ export default function Home() {
         <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button>
       </div>
       <div>
-        <p>所有日程列表: {JSON.stringify(data)}</p>
+        {/* <p>所有日程列表: {JSON.stringify(data)}</p> */}
         {/* <p>所有日程: {JSON.stringify(list)}</p> */}
       </div>
       <div>TOKEN: {token}</div>

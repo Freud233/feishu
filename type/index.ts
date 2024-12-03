@@ -94,3 +94,19 @@ export interface TimeEstimate {
   active: boolean
   includeNonBillable: boolean
 }
+
+export interface ILarkUserInfo {
+  calendar: Calendar
+  user_id: string
+}
+
+export interface Calendar {
+  calendar_id: string
+  color: number
+  description: string
+  permissions: string
+  role: string
+  summary: string
+  summary_alias: string
+  type: string
+}
