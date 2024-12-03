@@ -47,7 +47,7 @@ export default function MyTimer({
       description: title,
       start: clockifyStartTime,
       projectId,
-      end: (dayjs().format('YYYY-MM-DDTHH:mm:ssZ') as any) || undefined,
+      end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
     })
     console.log('🚀 ~ onPauseHandle ~ data:', data)
     console.log('🚀 ~ onPauseHandle ~ res:', res)
