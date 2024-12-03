@@ -40,7 +40,7 @@ const AuthPage = () => {
     }, 3000)
   }, [])
   return (
-    <Suspense>
+    <Suspense fallback='请稍等...'>
       <div>Auth Page</div>
     </Suspense>
   )
