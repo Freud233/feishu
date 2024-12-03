@@ -5,7 +5,7 @@ import { userLogin } from '@/actions/auth'
 import { getUserInfo } from '@/actions/clockify'
 import { useClockifyStore, useLarkStore } from '@/store'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 
 const AuthPage = () => {
   const router = useRouter()
@@ -39,6 +39,10 @@ const AuthPage = () => {
       router.push('/')
     }, 3000)
   }, [])
-  return <div>Auth Page</div>
+  return (
+    <Suspense>
+      <div>Auth Page</div>
+    </Suspense>
+  )
 }
 export default AuthPage
