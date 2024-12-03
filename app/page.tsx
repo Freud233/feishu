@@ -11,7 +11,7 @@ import { useState } from 'react'
 
 export default function Home() {
   const [data, setData] = useState<Array<any>>([])
-  const [list, setList] = useState({})
+  // const [list, setList] = useState({})
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
   const [projectId, setProjectId] = useState<any>()
@@ -68,7 +68,7 @@ export default function Home() {
                 return i.color
               }
             })
-            setColor(hexToRgbInt32(colorArr[0].color))
+            setColor(hexToRgbInt32(colorArr[0]?.color) || 0)
             setProjectId(e.currentKey)
           }}>
           {data.map((item) => (
@@ -93,7 +93,7 @@ export default function Home() {
       </div>
       <div>
         <p>所有日程列表: {JSON.stringify(data)}</p>
-        <p>所有日程: {JSON.stringify(list)}</p>
+        {/* <p>所有日程: {JSON.stringify(list)}</p> */}
       </div>
       <div>TOKEN: {token}</div>
       <div>日历ID: {calendarId}</div>

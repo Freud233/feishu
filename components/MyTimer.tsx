@@ -8,7 +8,7 @@ export default function MyTimer({ calendarId, token, workspaceId, projectId, col
   const [startTime, setStartTime] = useState<any>()
   const [clockifyStartTime, setClockifyStartTime] = useState<any>()
   const [title, setTitle] = useState('')
-  const { totalSeconds, seconds, minutes, hours, days, isRunning, start, pause, reset } = useStopwatch({})
+  const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({})
   const onPauseHandle = async () => {
     pause()
     if (!startTime || !calendarId || !token) return
