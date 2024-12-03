@@ -84,7 +84,7 @@ export default function Home() {
         <Button onClick={onGetLarkCalendarHandle} variant='bordered'>
           获取日历列表
         </Button>
-        <Link href={`${LARK_LOGIN_URL}`}>
+        <Link href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}>
           <Button>飞书登录</Button>
         </Link>
         <Button onClick={onGetTimeEntriesHandle}>获取时间条目</Button>
