@@ -39,10 +39,13 @@ const AuthPage = () => {
       router.push('/')
     }, 3000)
   }, [])
+  return <div>Auth Page</div>
+}
+const Auth = () => {
   return (
-    <Suspense fallback='请稍等...'>
-      <div>Auth Page</div>
+    <Suspense>
+      <AuthPage />
     </Suspense>
   )
 }
-export default AuthPage
+export default Auth
