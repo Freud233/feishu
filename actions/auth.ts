@@ -1,5 +1,6 @@
 'use server'
 
+import { signIn } from '@/auth'
 import { client } from '@/lark-sdk'
 
 export const userLogin = async (code: string) => {
@@ -9,6 +10,10 @@ export const userLogin = async (code: string) => {
       grant_type: 'authorization_code',
     },
   })
- 
+
   return data
+}
+
+export const onGithubLoginHandle = async () => {
+  await signIn('github')
 }

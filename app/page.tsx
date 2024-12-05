@@ -1,5 +1,6 @@
 'use client'
 import { getLarkCalendar } from '@/actions'
+import { onGithubLoginHandle } from '@/actions/auth'
 import { createTimeEntries, getAllProject, getTimeEntries } from '@/actions/clockify'
 import MyTimer from '@/components/MyTimer'
 import { LARK_LOGIN_URL } from '@/constants'
@@ -38,6 +39,7 @@ export default function Home() {
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data)
     updateProjectData(data)
   }
+
   function hexToRgbInt32(hex: string) {
     // 去掉前导的 '#'
     hex = hex.slice(1)
@@ -90,6 +92,7 @@ export default function Home() {
         <Button onClick={onGetTimeEntriesHandle}>获取时间条目</Button>
         <Button onClick={onGetAllProjectHandle}>获取所有项目</Button>
         <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button>
+        <Button onClick={onGithubLoginHandle}>github登录</Button>
       </div>
       <div>
         {/* <p>所有日程列表: {JSON.stringify(data)}</p> */}
