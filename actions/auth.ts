@@ -17,3 +17,7 @@ export const userLogin = async (code: string) => {
 export const onGithubLoginHandle = async () => {
   await signIn('github')
 }
+
+export const onLarkLoginHandle = async () => {
+  await signIn('lark')
+}

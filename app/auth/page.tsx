@@ -34,7 +34,7 @@ const AuthPage = () => {
     updateClockifyUserId(id)
   }
   useEffect(() => {
-    onLoginHandle()
+    // onLoginHandle()
     setTimeout(() => {
       router.push('/')
     }, 3000)

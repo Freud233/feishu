@@ -1,18 +1,19 @@
 'use client'
 import { getLarkCalendar } from '@/actions'
-import { onGithubLoginHandle } from '@/actions/auth'
+import { onGithubLoginHandle, onLarkLoginHandle } from '@/actions/auth'
 import { createTimeEntries, getAllProject, getTimeEntries } from '@/actions/clockify'
 import MyTimer from '@/components/MyTimer'
 import { LARK_LOGIN_URL } from '@/constants'
 import { useClockifyStore, useLarkStore } from '@/store'
 import { IClockifyProject } from '@/type'
 import { Button, Select, SelectItem } from '@nextui-org/react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Home() {
-  // const [data, setData] = useState<ILarkUserInfo[]>([])
-  // const [list, setList] = useState({})
+  const { data } = useSession()
+  console.log("🚀 ~ Home ~ data:", data)
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
   const [projectId, setProjectId] = useState<string>('')
@@ -93,6 +94,7 @@ export default function Home() {
         <Button onClick={onGetAllProjectHandle}>获取所有项目</Button>
         <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button>
         <Button onClick={onGithubLoginHandle}>github登录</Button>
+        <Button onClick={onLarkLoginHandle}>OAuth 飞书登录</Button>
       </div>
       <div>
         {/* <p>所有日程列表: {JSON.stringify(data)}</p> */}
