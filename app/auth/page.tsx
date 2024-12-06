@@ -38,7 +38,7 @@ const AuthPage = () => {
     setTimeout(() => {
       router.push('/')
     }, 3000)
-  }, [])
+  })
   return <div>Auth Page</div>
 }
 const Auth = () => {

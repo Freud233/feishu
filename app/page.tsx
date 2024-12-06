@@ -1,7 +1,7 @@
 'use client'
 import { getLarkCalendar } from '@/actions'
 import { onGithubLoginHandle, onLarkLoginHandle } from '@/actions/auth'
-import { createTimeEntries, getAllProject, getTimeEntries } from '@/actions/clockify'
+import { getAllProject, getTimeEntries } from '@/actions/clockify'
 import Header from '@/components/Header'
 import MyTimer from '@/components/MyTimer'
 import { LARK_LOGIN_URL } from '@/constants'
@@ -32,10 +32,10 @@ export default function Home() {
     const data = await getTimeEntries(clockifyUserId, workspaceId)
     console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data)
   }
-  const onCreateTimeEntriesHandle = async () => {
-    const data = await createTimeEntries(workspaceId)
-    console.log('🚀 ~ onCreateTimeEntriesHandle ~ data:', data)
-  }
+  // const onCreateTimeEntriesHandle = async () => {
+  //   const data = await createTimeEntries(workspaceId)
+  //   console.log('🚀 ~ onCreateTimeEntriesHandle ~ data:', data)
+  // }
   const onGetAllProjectHandle = async () => {
     const data = await getAllProject(workspaceId)
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data)
