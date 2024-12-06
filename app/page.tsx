@@ -2,6 +2,7 @@
 import { getLarkCalendar } from '@/actions'
 import { onGithubLoginHandle, onLarkLoginHandle } from '@/actions/auth'
 import { createTimeEntries, getAllProject, getTimeEntries } from '@/actions/clockify'
+import Header from '@/components/Header'
 import MyTimer from '@/components/MyTimer'
 import { LARK_LOGIN_URL } from '@/constants'
 import { useClockifyStore, useLarkStore } from '@/store'
@@ -13,7 +14,7 @@ import { useState } from 'react'
 
 export default function Home() {
   const { data } = useSession()
-  console.log("🚀 ~ Home ~ data:", data)
+  console.log('🚀 ~ Home ~ data:', data)
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
   const [projectId, setProjectId] = useState<string>('')
@@ -82,31 +83,42 @@ export default function Home() {
     )
   }
   return (
-    <div className='p-2'>
-      <div className='flex gap-2 p-2'>
-        <Button onClick={onGetLarkCalendarHandle} variant='bordered'>
-          获取日历列表
-        </Button>
-        <Link href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}>
-          <Button>飞书登录</Button>
-        </Link>
-        <Button onClick={onGetTimeEntriesHandle}>获取时间条目</Button>
-        <Button onClick={onGetAllProjectHandle}>获取所有项目</Button>
-        <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button>
-        <Button onClick={onGithubLoginHandle}>github登录</Button>
-        <Button onClick={onLarkLoginHandle}>OAuth 飞书登录</Button>
-      </div>
-      <div>
-        {/* <p>所有日程列表: {JSON.stringify(data)}</p> */}
-        {/* <p>所有日程: {JSON.stringify(list)}</p> */}
-      </div>
-      <div>TOKEN: {token}</div>
-      <div>日历ID: {calendarId}</div>
-      <div>工作区ID: {workspaceId}</div>
-      <div>clockify用户ID: {clockifyUserId}</div>
-      <div className='flex gap-2 rounded-xl p-2 bg-red-100'>
-        <MyTimer token={token} calendarId={calendarId} workspaceId={workspaceId} projectId={projectId} color={color} />
-        {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
+    <div className='h-screen'>
+      <Header></Header>
+      <div className='grid grid-rows-3 grid-flow-col gap-4 p-4'>
+        <div className='flex gap-2 p-2 rounded-xl col-span-2 bg-sky-50 leading-10'>
+          <Button onClick={onGetLarkCalendarHandle} variant='ghost' color='primary'>
+            获取日历列表
+          </Button>
+          <Link href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}>
+            <Button variant='ghost' color='secondary'>
+              飞书登录
+            </Button>
+          </Link>
+          <Button color='success' onClick={onGetTimeEntriesHandle} variant='ghost'>
+            获取时间条目
+          </Button>
+          <Button variant='ghost' color='secondary' onClick={onGetAllProjectHandle}>
+            获取所有项目
+          </Button>
+          {/* <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button> */}
+          <Button variant='ghost' color='success' onClick={onGithubLoginHandle}>
+            github登录
+          </Button>
+          <Button variant='ghost' color='secondary' onClick={onLarkLoginHandle}>
+            OAuth 飞书登录
+          </Button>
+        </div>
+        <div className='flex gap-3 flex-col row-span-2 col-span-2 rounded-xl bg-pink-50 p-2'>
+          <div>TOKEN: {token}</div>
+          <div>日历ID: {calendarId}</div>
+          <div>工作区ID: {workspaceId}</div>
+          <div>clockify用户ID: {clockifyUserId}</div>
+        </div>
+        <div className='gap-2 rounded-xl row-span-3 col-span-1 flex'>
+          <MyTimer token={token} calendarId={calendarId} workspaceId={workspaceId} projectId={projectId} color={color} />
+          {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
+        </div>
       </div>
     </div>
   )

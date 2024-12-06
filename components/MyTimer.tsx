@@ -58,7 +58,7 @@ export default function MyTimer({
     start()
   }
   return (
-    <div className='flex flex-col min-w-60 max-w-80 gap-2 p-4 bg-yellow-200 rounded-xl'>
+    <div className='flex flex-col gap-2 p-4 bg-yellow-200 rounded-xl w-full'>
       <Input color='secondary' value={title} onChange={(e) => setTitle(e.target.value)} />
       <p>Timer Demo</p>
       <p>总时间: {totalSeconds}</p>
