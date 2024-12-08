@@ -1,6 +1,5 @@
 'use client'
 import { getLarkCalendar } from '@/actions'
-import { onGithubLoginHandle, onLarkLoginHandle } from '@/actions/auth'
 import { getAllProject, getTimeEntries } from '@/actions/clockify'
 import Header from '@/components/Header'
 import MyTimer from '@/components/MyTimer'
@@ -13,8 +12,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Home() {
-  const { data ,status} = useSession()
-  console.log('🚀 ~ Home ~ data:', data)
+  const { data } = useSession()
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
   const [projectId, setProjectId] = useState<string>('')
@@ -102,12 +100,12 @@ export default function Home() {
             获取所有项目
           </Button>
           {/* <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button> */}
-          <Button variant='ghost' color='success' onClick={onGithubLoginHandle}>
+          {/* <Button variant='ghost' color='success' onClick={onGithubLoginHandle}>
             github登录
-          </Button>
-          <Button variant='ghost' color='secondary' onClick={onLarkLoginHandle}>
+          </Button> */}
+          {/* <Button variant='ghost' color='secondary' onClick={onLarkLoginHandle}>
             OAuth 飞书登录
-          </Button>
+          </Button> */}
         </div>
         <div className='flex gap-3 flex-col row-span-2 col-span-2 rounded-xl bg-pink-50 p-2'>
           <div>TOKEN: {token}</div>
