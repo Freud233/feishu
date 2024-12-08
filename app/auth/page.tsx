@@ -32,12 +32,12 @@ const AuthPage = () => {
     const { id, activeWorkspace } = clockifyData
     updateWorkspaceId(activeWorkspace)
     updateClockifyUserId(id)
-  }
-  useEffect(() => {
-    onLoginHandle()
     setTimeout(() => {
       router.push('/')
     }, 3000)
+  }
+  useEffect(() => {
+    onLoginHandle()
   })
   return <div>Auth Page</div>
 }

@@ -7,12 +7,10 @@ import { LARK_LOGIN_URL } from '@/constants'
 import { useClockifyStore, useLarkStore } from '@/store'
 import { IClockifyProject } from '@/type'
 import { Button, Select, SelectItem } from '@nextui-org/react'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Home() {
-  const { data } = useSession()
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()
   const [projectId, setProjectId] = useState<string>('')
@@ -88,11 +86,9 @@ export default function Home() {
           <Button onClick={onGetLarkCalendarHandle} variant='ghost' color='primary'>
             获取日历列表
           </Button>
-          <Link href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}>
-            <Button variant='ghost' color='secondary'>
-              飞书登录
-            </Button>
-          </Link>
+          <Button as={Link} href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`} variant='ghost' color='secondary'>
+            飞书登录
+          </Button>
           <Button color='success' onClick={onGetTimeEntriesHandle} variant='ghost'>
             获取时间条目
           </Button>
