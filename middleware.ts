@@ -1,7 +1,7 @@
 import { auth } from './auth'
 
 export default auth((req) => {
-  console.log("🚀 ~ auth ~ req:", req)
+  // console.log("🚀 ~ auth ~ req:", req)
   // req.auth
 })
 

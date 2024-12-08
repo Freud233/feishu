@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 export default function Home() {
-  const { data } = useSession()
+  const { data ,status} = useSession()
   console.log('🚀 ~ Home ~ data:', data)
   const { token, calendarId, updateCalendarId } = useLarkStore()
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore()

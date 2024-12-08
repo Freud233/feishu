@@ -19,5 +19,5 @@ export const onGithubLoginHandle = async () => {
 }
 
 export const onLarkLoginHandle = async () => {
-  // await signIn('lark')
+  await signIn('lark')
 }

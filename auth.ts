@@ -9,7 +9,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       console.log('🚀 ~ session ~ token:', token)
       return session
     },
-    async jwt({ token }) {
+    async jwt({ token, account }) {
+      if (account?.access_token) {
+        token.access_token = account.access_token
+      }
       console.log('🚀 ~ jwt ~ token:', token)
       return token
     },
