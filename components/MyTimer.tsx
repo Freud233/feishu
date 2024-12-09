@@ -1,9 +1,9 @@
-import { createCalendarEvent } from '@/actions'
-import { createTimeEntries } from '@/actions/clockify'
-import { Button, Input } from '@nextui-org/react'
-import dayjs from 'dayjs'
-import { useState } from 'react'
-import { useStopwatch } from 'react-timer-hook'
+import { createCalendarEvent } from '@/actions';
+import { createTimeEntries } from '@/actions/clockify';
+import { Button, Input } from '@nextui-org/react';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+import { useStopwatch } from 'react-timer-hook';
 export default function MyTimer({
   calendarId,
   token,
@@ -11,20 +11,20 @@ export default function MyTimer({
   projectId,
   color,
 }: {
-  calendarId: string
-  token: string
-  workspaceId: string
-  projectId: string
-  color: number
+  calendarId: string;
+  token: string;
+  workspaceId: string;
+  projectId: string;
+  color: number;
 }) {
-  const [startTime, setStartTime] = useState<number>()
-  const [clockifyStartTime, setClockifyStartTime] = useState('')
-  const [title, setTitle] = useState('')
-  const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({})
+  const [startTime, setStartTime] = useState<number>();
+  const [clockifyStartTime, setClockifyStartTime] = useState('');
+  const [title, setTitle] = useState('');
+  const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({});
   const onPauseHandle = async () => {
-    pause()
-    if (!startTime || !calendarId || !token) return
-    const endTime = startTime + totalSeconds + ''
+    pause();
+    if (!startTime || !calendarId || !token) return;
+    const endTime = startTime + totalSeconds + '';
     const data = await createCalendarEvent(
       {
         data: {
@@ -41,50 +41,51 @@ export default function MyTimer({
           calendar_id: calendarId,
         },
       },
-      token
-    )
+      token,
+    );
     const res = await createTimeEntries(workspaceId, {
       description: title,
       start: clockifyStartTime,
       projectId,
       end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
-    })
-    console.log('🚀 ~ onPauseHandle ~ data:', data)
-    console.log('🚀 ~ onPauseHandle ~ res:', res)
-  }
+    });
+    console.log('🚀 ~ onPauseHandle ~ data:', data);
+    console.log('🚀 ~ onPauseHandle ~ res:', res);
+  };
   const onStartHandle = async () => {
-    setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'))
-    setStartTime(Math.floor(dayjs().valueOf() / 1000))
-    start()
-  }
+    setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'));
+    setStartTime(Math.floor(dayjs().valueOf() / 1000));
+    start();
+  };
   return (
-    <div className='flex flex-col gap-2 p-4 bg-yellow-200 rounded-xl w-full'>
-      <Input color='secondary' value={title} onChange={(e) => setTitle(e.target.value)} />
+    <div className="flex w-full flex-col gap-2 rounded-xl bg-jade-200 p-4">
+      <Input color="success" value={title} onChange={(e) => setTitle(e.target.value)} />
       <p>Timer Demo</p>
       <p>总时间: {totalSeconds}</p>
       <div style={{ fontSize: '100px' }}>
         <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
       </div>
       <p>{isRunning ? 'Running' : 'Not running'}</p>
-      <div className='flex gap-2'>
+      <div className="flex gap-2">
         {isRunning ? (
-          <Button onClick={onPauseHandle} color='danger'>
+          <Button onClick={onPauseHandle} color="danger">
             Pause
           </Button>
         ) : (
-          <Button onClick={onStartHandle} color='success'>
+          <Button onClick={onStartHandle} color="success">
             Start
           </Button>
         )}
         <Button
           onClick={() => {
-            setStartTime(Math.floor(dayjs().valueOf() / 1000))
-            reset()
+            setStartTime(Math.floor(dayjs().valueOf() / 1000));
+            reset();
           }}
-          color='primary'>
+          color="primary"
+        >
           Reset
         </Button>
       </div>
     </div>
-  )
+  );
 }
