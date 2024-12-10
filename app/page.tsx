@@ -4,8 +4,9 @@ import { getAllProject, getTimeEntries } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
 import { LARK_LOGIN_URL } from '@/constants';
+import { hexToRgbInt32 } from '@/lib';
 import { useClockifyStore, useLarkStore } from '@/store';
-import { IClockifyProject } from '@/type';
+import { IClockifyProject } from '@/type/store';
 import { Button, Select, SelectItem } from '@nextui-org/react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -19,40 +20,22 @@ export default function Home() {
     const data = await getLarkCalendar(token);
     const cls = data?.data?.calendars;
     if (cls) {
-      // setData(cls)
       const id = cls[0].calendar?.calendar_id || '';
       updateCalendarId(id);
     }
   };
+
   const onGetTimeEntriesHandle = async () => {
     const data = await getTimeEntries(clockifyUserId, workspaceId);
     console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data);
   };
-  // const onCreateTimeEntriesHandle = async () => {
-  //   const data = await createTimeEntries(workspaceId)
-  //   console.log('🚀 ~ onCreateTimeEntriesHandle ~ data:', data)
-  // }
+
   const onGetAllProjectHandle = async () => {
     const data = await getAllProject(workspaceId);
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data);
     updateProjectData(data);
   };
 
-  function hexToRgbInt32(hex: string) {
-    // 去掉前导的 '#'
-    hex = hex.slice(1);
-
-    // 解析 RGB 分量
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-
-    // 组合成一个 32 位的整数（在 JavaScript 中是 Number 类型）
-    // 注意：这里我们实际上只使用了低 24 位，因为 RGB 只有 24 位
-    const rgbInt32 = (r << 16) | (g << 8) | b;
-
-    return rgbInt32;
-  }
   const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
     return (
       <>
@@ -101,13 +84,6 @@ export default function Home() {
           <Button variant="ghost" color="secondary" onClick={onGetAllProjectHandle}>
             获取所有项目
           </Button>
-          {/* <Button onClick={onCreateTimeEntriesHandle}>添加时间条目</Button> */}
-          {/* <Button variant='ghost' color='success' onClick={onGithubLoginHandle}>
-            github登录
-          </Button> */}
-          {/* <Button variant='ghost' color='secondary' onClick={onLarkLoginHandle}>
-            OAuth 飞书登录
-          </Button> */}
         </div>
         <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
           <div>TOKEN: {token}</div>

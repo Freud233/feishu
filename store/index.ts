@@ -1,25 +1,10 @@
-import { IClockifyProject } from '@/type';
+import { IClockifyProject, IClockifyStore, ILarkStore } from '@/type/store';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-type ILarkStore = {
-  token: string;
-  calendarId: string;
-  updateToken: (token: string) => void;
-  removeToken: () => void;
-  updateCalendarId: (id: string) => void;
-  removeCalendarId: () => void;
-};
-
-type IClockifyStore = {
-  workspaceId: string;
-  clockifyUserId: string;
-  projectData: IClockifyProject[];
-  updateWorkspaceId: (id: string) => void;
-  updateClockifyUserId: (id: string) => void;
-  updateProjectData: (newArr: IClockifyProject[]) => void;
-};
-
+/**
+ * 飞书相关数据
+ * */
 export const useLarkStore = create<ILarkStore>()(
   immer(
     persist(
@@ -41,7 +26,9 @@ export const useLarkStore = create<ILarkStore>()(
     ),
   ),
 );
-
+/**
+ * Clockify相关数据
+ * */
 export const useClockifyStore = create<IClockifyStore>()(
   immer(
     persist(
@@ -69,4 +56,3 @@ export const useClockifyStore = create<IClockifyStore>()(
     ),
   ),
 );
-
