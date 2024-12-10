@@ -41,6 +41,9 @@ importers:
       react-timer-hook:
         specifier: ^3.0.8
         version: 3.0.8(react@19.0.0-rc-66855b96-20241106)
+      react-toastify:
+        specifier: ^10.0.6
+        version: 10.0.6(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
       zustand:
         specifier: ^5.0.1
         version: 5.0.1(@types/react@18.3.12)(immer@10.1.1)(react@19.0.0-rc-66855b96-20241106)
@@ -3108,6 +3111,12 @@ packages:
     resolution: {integrity: sha512-bi2e7DhPBU1MRPU4ZHaVqBmgM9e2HK0ae8O2AIqwqjcPo4/qR7lVGQonOQLAKOZPQCJSYfV8F5aBWzOLXElzqQ==}
     peerDependencies:
       react: '>=16.8.0'
+
+  react-toastify@10.0.6:
+    resolution: {integrity: sha512-yYjp+omCDf9lhZcrZHKbSq7YMuK0zcYkDFTzfRFgTXkTFHZ1ToxwAonzA4JI5CxA91JpjFLmwEsZEgfYfOqI1A==}
+    peerDependencies:
+      react: '>=18'
+      react-dom: '>=18'
 
   react@19.0.0-rc-66855b96-20241106:
     resolution: {integrity: sha512-klH7xkT71SxRCx4hb1hly5FJB21Hz0ACyxbXYAECEqssUjtJeFUAaI2U1DgJAzkGEnvEm3DkxuBchMC/9K4ipg==}
@@ -7566,6 +7575,12 @@ snapshots:
   react-timer-hook@3.0.8(react@19.0.0-rc-66855b96-20241106):
     dependencies:
       react: 19.0.0-rc-66855b96-20241106
+
+  react-toastify@10.0.6(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106):
+    dependencies:
+      clsx: 2.1.1
+      react: 19.0.0-rc-66855b96-20241106
+      react-dom: 19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106)
 
   react@19.0.0-rc-66855b96-20241106: {}
 

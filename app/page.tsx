@@ -10,7 +10,6 @@ import { IClockifyProject } from '@/type/store';
 import { Button, Select, SelectItem } from '@nextui-org/react';
 import Link from 'next/link';
 import { useState } from 'react';
-
 export default function Home() {
   const { token, calendarId, updateCalendarId } = useLarkStore();
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore();

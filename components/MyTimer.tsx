@@ -46,7 +46,7 @@ export default function MyTimer({
     const res = await createTimeEntries(workspaceId, {
       description: title,
       start: clockifyStartTime,
-      projectId,
+      projectId: projectId || undefined,
       end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
     });
     console.log('🚀 ~ onPauseHandle ~ data:', data);
