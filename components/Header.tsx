@@ -3,7 +3,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 
 const Header = () => {
   const { data: session } = useSession();
-  console.log('🚀 ~ Header ~ session:', session);
+  // console.log('🚀 ~ Header ~ session:', session);
   return (
     <div className="m-auto flex h-16 items-center justify-between bg-jade-100 p-2">
       <div className="text-2xl font-semibold text-jade-950">LOGO</div>

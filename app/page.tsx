@@ -109,12 +109,12 @@ export default function Home() {
             OAuth 飞书登录
           </Button> */}
         </div>
-        {/* <div className='flex gap-3 flex-col row-span-2 col-span-2 rounded-xl bg-jade-50 p-4'>
+        <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
           <div>TOKEN: {token}</div>
           <div>日历ID: {calendarId}</div>
           <div>工作区ID: {workspaceId}</div>
           <div>clockify用户ID: {clockifyUserId}</div>
-        </div> */}
+        </div>
         <div className="flex flex-col gap-2 rounded-xl">
           {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
           <MyTimer
