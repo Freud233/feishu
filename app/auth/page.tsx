@@ -6,6 +6,7 @@ import { getUserInfo } from '@/actions/clockify';
 import { useClockifyStore, useLarkStore } from '@/store';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const AuthPage = () => {
   const router = useRouter();
@@ -15,8 +16,12 @@ const AuthPage = () => {
 
   const onLoginHandle = async () => {
     // 获取飞书用户信息
-    const data = await userLogin(code);
+    const { data, code: resCode, msg } = await userLogin(code);
     console.log('🚀 ~ onLoginHandle ~ data:', data);
+    if (resCode != 0) {
+      toast.warning(msg);
+      return;
+    }
     if (data?.access_token) {
       updateToken(data.access_token);
       const larkCalendarData = await getLarkCalendar(data.access_token);
@@ -32,13 +37,13 @@ const AuthPage = () => {
     const { id, activeWorkspace } = clockifyData;
     updateWorkspaceId(activeWorkspace);
     updateClockifyUserId(id);
-    setTimeout(() => {
-      router.push('/');
-    }, 3000);
   };
   useEffect(() => {
     onLoginHandle();
-  });
+    setTimeout(() => {
+      router.push('/');
+    }, 3000);
+  }, [code]);
   return <div>Auth Page</div>;
 };
 const Auth = () => {
