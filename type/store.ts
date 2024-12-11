@@ -4,12 +4,26 @@
 export type ILarkStore = {
   token: string;
   calendarId: string;
+  refreshToken: string;
+  isTokenExpired: boolean;
+  tokenExpiredAt: number;
   updateToken: (token: string) => void;
   removeToken: () => void;
   updateCalendarId: (id: string) => void;
   removeCalendarId: () => void;
+  updateRefreshToken: (token: string) => void;
+  updateIsTokenExpired: () => void;
+  updateTokenExpiredAt: (time: number) => void;
 };
 
+export type IUserInfo = {
+  username: string | undefined;
+  userId: string | undefined;
+  avatarUrl: string | undefined;
+  updateUsername: (newName: string | undefined) => void;
+  updateUserId: (newId: string | undefined) => void;
+  updateAvatarUrl: (newUrl: string | undefined) => void;
+};
 export type IClockifyStore = {
   workspaceId: string;
   clockifyUserId: string;

@@ -10,13 +10,6 @@ export const getLarkCalendar = async (token: string): Promise<ResData> => {
         code: 10001,
         msg: '获取日程失败',
       };
-    // const data = await fetch('https://open.feishu.cn/open-apis/calendar/v4/calendars/primary', {
-    //   method: 'POST',
-    //   headers: {
-    //     Authorization: `Bearer ${openId}`,
-    //   },
-    // })
-    // return data.json()
     const { data, code, msg } = await client.calendar.calendar.primary(
       {
         params: {
@@ -51,6 +44,15 @@ export const getCalendarEvents = async (calendarId: string, token: string): Prom
       lark.withUserAccessToken(token),
     );
     return code === 0 ? { data, msg, code } : { code: 10001, msg: '登录错误' };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserInfo = async (token: string) => {
+  try {
+    const { code, data, msg } = await client.authen.userInfo.get({}, lark.withUserAccessToken(token));
+    return code === 0 ? { data, msg, code } : { code: 10001, msg: '获取用户信息错误' };
   } catch (error) {
     throw error;
   }

@@ -1,16 +1,19 @@
-import { IClockifyProject, IClockifyStore, ILarkStore } from '@/type/store';
+import { IClockifyProject, IClockifyStore, ILarkStore, IUserInfo } from '@/type/store';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 /**
- * 飞书相关数据
+ * 飞书 token 日历ID 数据
  * */
-export const useLarkStore = create<ILarkStore>()(
+const useLarkStore = create<ILarkStore>()(
   immer(
     persist(
       (set) => ({
         token: '',
         calendarId: '',
+        refreshToken: '',
+        isTokenExpired: true,
+        tokenExpiredAt: 0,
         updateToken: (newToken: string) =>
           set((state) => {
             state.token = newToken;
@@ -21,6 +24,19 @@ export const useLarkStore = create<ILarkStore>()(
             state.calendarId = newId;
           }),
         removeCalendarId: () => set({ calendarId: '' }),
+        updateRefreshToken: (newToken: string) =>
+          set((state) => {
+            state.refreshToken = newToken;
+          }),
+        updateIsTokenExpired: () =>
+          set((state) => {
+            const time = new Date().getTime();
+            state.isTokenExpired = state.tokenExpiredAt < time;
+          }),
+        updateTokenExpiredAt: (newTime: number) =>
+          set((state) => {
+            state.tokenExpiredAt = newTime;
+          }),
       }),
       { name: 'lark-store', storage: createJSONStorage(() => localStorage) },
     ),
@@ -29,7 +45,7 @@ export const useLarkStore = create<ILarkStore>()(
 /**
  * Clockify相关数据
  * */
-export const useClockifyStore = create<IClockifyStore>()(
+const useClockifyStore = create<IClockifyStore>()(
   immer(
     persist(
       (set) => ({
@@ -56,3 +72,37 @@ export const useClockifyStore = create<IClockifyStore>()(
     ),
   ),
 );
+
+/**
+ * 保存用户信息
+ * */
+const useUserInfoStore = create<IUserInfo>()(
+  immer(
+    persist(
+      (set) => ({
+        username: undefined,
+        avatarUrl: undefined,
+        userId: undefined,
+        updateAvatarUrl: (newUrl: string | undefined) =>
+          set((state) => {
+            state.avatarUrl = newUrl;
+          }),
+        updateUserId: (newId: string | undefined) =>
+          set((state) => {
+            state.userId = newId;
+          }),
+        updateUsername: (newName: string | undefined) =>
+          set((state) => {
+            state.username = newName;
+          }),
+      }),
+      {
+        name: 'user-info',
+        storage: createJSONStorage(() => sessionStorage),
+      },
+    ),
+  ),
+);
+
+export { useClockifyStore, useLarkStore, useUserInfoStore };
+

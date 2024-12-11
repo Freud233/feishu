@@ -22,7 +22,7 @@ export const getAllWorkSpaces = async () => {
  * 获取用户信息
  *
  * */
-export const getUserInfo = async () => {
+export const getClockifyUserInfo = async () => {
   const { data } = await axiosInstance.get('/v1/user')
   return data
 }
