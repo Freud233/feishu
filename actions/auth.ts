@@ -11,17 +11,16 @@ export const userLogin = async (verifyCode: string): Promise<ResData> => {
       grant_type: 'authorization_code',
     },
   });
-  if (code === 20003) {
-    return {
-      code: 0,
-      msg: '登录成功',
-      data,
-    };
-  }
-  return {
-    code: 10003,
-    msg: '登录错误',
-  };
+  return code === 0
+    ? {
+        code: 0,
+        msg: '登录成功',
+        data,
+      }
+    : {
+        code: 10003,
+        msg: '登录错误',
+      };
 };
 
 export const onGithubLoginHandle = async () => {
