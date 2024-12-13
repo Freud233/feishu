@@ -1,27 +1,27 @@
 'use client';
-import { getLarkCalendar } from '@/actions';
 import { getAllProject, getTimeEntries } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
 import { LARK_LOGIN_URL } from '@/constants';
 import { hexToRgbInt32 } from '@/lib';
-import { useClockifyStore, useLarkStore } from '@/store';
+import { useClockifyStore, useLarkStore, useUserInfoStore } from '@/store';
 import { IClockifyProject } from '@/type/store';
 import { Button, Link, Select, SelectItem } from '@nextui-org/react';
 import { useState } from 'react';
 export default function Home() {
-  const { token, calendarId, updateCalendarId } = useLarkStore();
+  const { token, calendarId } = useLarkStore();
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore();
   const [projectId, setProjectId] = useState<string>('');
   const [color, setColor] = useState(0);
-  const onGetLarkCalendarHandle = async () => {
-    const data = await getLarkCalendar(token);
-    const cls = data?.data?.calendars;
-    if (cls) {
-      const id = cls[0].calendar?.calendar_id || '';
-      updateCalendarId(id);
-    }
-  };
+  const { userId } = useUserInfoStore();
+  // const onGetLarkCalendarHandle = async () => {
+  //   const data = await getLarkCalendar(token);
+  //   const cls = data?.data?.calendars;
+  //   if (cls) {
+  //     const id = cls[0].calendar?.calendar_id || '';
+  //     updateCalendarId(id);
+  //   }
+  // };
 
   const onGetTimeEntriesHandle = async () => {
     const data = await getTimeEntries(clockifyUserId, workspaceId);
@@ -93,6 +93,7 @@ export default function Home() {
           {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
           <MyTimer
             token={token}
+            userId={userId || ''}
             calendarId={calendarId}
             workspaceId={workspaceId}
             projectId={projectId}

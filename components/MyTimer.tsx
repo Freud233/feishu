@@ -1,6 +1,6 @@
 import { createCalendarEvent } from '@/actions';
 import { createTimeEntries } from '@/actions/clockify';
-import { Button, Input } from '@nextui-org/react';
+import { Button, Input, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
@@ -10,12 +10,14 @@ export default function MyTimer({
   workspaceId,
   projectId,
   color,
+  userId,
 }: {
   calendarId: string;
   token: string;
   workspaceId: string;
   projectId: string;
   color: number;
+  userId: string;
 }) {
   const [startTime, setStartTime] = useState<number>();
   const [clockifyStartTime, setClockifyStartTime] = useState('');
@@ -72,9 +74,11 @@ export default function MyTimer({
             Pause
           </Button>
         ) : (
-          <Button onClick={onStartHandle} color="success">
-            Start
-          </Button>
+          <Tooltip content="请先登录" color="danger" className={userId ? 'hidden' : 'block'}>
+            <Button onClick={onStartHandle} color="success" disabled={userId ? false : true}>
+              Start
+            </Button>
+          </Tooltip>
         )}
         <Button
           onClick={() => {
