@@ -5,6 +5,11 @@ import { client } from '@/lark-sdk';
 import { ResData } from '@/type/response';
 
 export const userLogin = async (verifyCode: string): Promise<ResData> => {
+  if (!verifyCode)
+    return {
+      code: 10003,
+      msg: 'token令牌错误',
+    };
   const { data, msg, code } = await client.authen.accessToken.create({
     data: {
       code: verifyCode,
