@@ -79,6 +79,7 @@ export default function MyTimer({
         <Button
           onClick={() => {
             setStartTime(Math.floor(dayjs().valueOf() / 1000));
+            setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'));
             reset();
           }}
           color="primary"

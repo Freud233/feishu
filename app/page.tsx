@@ -7,8 +7,7 @@ import { LARK_LOGIN_URL } from '@/constants';
 import { hexToRgbInt32 } from '@/lib';
 import { useClockifyStore, useLarkStore } from '@/store';
 import { IClockifyProject } from '@/type/store';
-import { Button, Select, SelectItem } from '@nextui-org/react';
-import Link from 'next/link';
+import { Button, Link, Select, SelectItem } from '@nextui-org/react';
 import { useState } from 'react';
 export default function Home() {
   const { token, calendarId, updateCalendarId } = useLarkStore();
@@ -66,9 +65,9 @@ export default function Home() {
       <Header></Header>
       <div className="flex flex-col gap-4 p-4 md:flex-row">
         <div className="col-span-1 flex flex-col gap-2 rounded-xl p-2 leading-10">
-          <Button onClick={onGetLarkCalendarHandle} variant="ghost" color="primary">
+          {/* <Button onClick={onGetLarkCalendarHandle} variant="ghost" color="primary">
             获取日历列表
-          </Button>
+          </Button> */}
           <Button
             as={Link}
             href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}
