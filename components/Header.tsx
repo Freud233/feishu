@@ -37,7 +37,7 @@ const Header = () => {
     if (isExpired()) {
       getLarkRefreshToken(token, refreshToken).then((res) => {
         if (!token || !refreshToken) return;
-        const { code, msg, data } = res;
+        const { msg, data } = res;
         console.log('🚀 ~ getLarkRefreshToken ~ data:', data);
         updateToken(data?.access_token);
         updateRefreshToken(data?.refresh_token);

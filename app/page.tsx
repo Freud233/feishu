@@ -22,7 +22,6 @@ export default function Home() {
   //     updateCalendarId(id);
   //   }
   // };
-
   const onGetTimeEntriesHandle = async () => {
     const data = await getTimeEntries(clockifyUserId, workspaceId);
     console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data);

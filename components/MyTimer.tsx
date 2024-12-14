@@ -53,7 +53,7 @@ export default function MyTimer({
       end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
     });
     console.log('🚀 ~ onPauseHandle ~ data:', data);
-    const { code, msg } = data;
+    const { code } = data;
     if (code === 0) {
       toast.success('创建日程成功', { position: 'bottom-right' });
     } else {
