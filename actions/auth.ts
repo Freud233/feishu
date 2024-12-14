@@ -1,10 +1,9 @@
 'use server';
-
 import { signIn } from '@/auth';
 import { client } from '@/lark-sdk';
-import { ResData } from '@/type/response';
+import { IResData } from '@/type/response';
 
-export const userLogin = async (verifyCode: string): Promise<ResData> => {
+export const getLarkAccessToken = async (verifyCode: string): Promise<IResData> => {
   if (!verifyCode) {
     return {
       code: 10004,
@@ -29,6 +28,28 @@ export const userLogin = async (verifyCode: string): Promise<ResData> => {
       };
 };
 
+export const getLarkRefreshToken = async (accessToken: string, refresh_token: string): Promise<IResData> => {
+  try {
+    if (!accessToken || !refresh_token)
+      return {
+        code: 10005,
+        msg: '请输入token',
+      };
+    const { code, data, msg } = await client.authen.refreshAccessToken.create({
+      data: {
+        grant_type: 'refresh_token',
+        refresh_token,
+      },
+    });
+    return {
+      code,
+      msg,
+      data,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
 export const onGithubLoginHandle = async () => {
   await signIn('github');
 };

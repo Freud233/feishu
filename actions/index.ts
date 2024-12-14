@@ -1,8 +1,8 @@
 'use server';
 import { client } from '@/lark-sdk';
-import { ResData } from '@/type/response';
+import { IResData } from '@/type/response';
 import * as lark from '@larksuiteoapi/node-sdk';
-export const getLarkCalendar = async (token: string): Promise<ResData> => {
+export const getLarkCalendar = async (token: string): Promise<IResData> => {
   console.log('🚀 ~ getCalendar ~ openId:', token);
   try {
     if (!token)
@@ -24,7 +24,7 @@ export const getLarkCalendar = async (token: string): Promise<ResData> => {
   }
 };
 
-export const createCalendarEvent = async (payload: any, token: string): Promise<ResData> => {
+export const createCalendarEvent = async (payload: any, token: string): Promise<IResData> => {
   try {
     const { code, data, msg } = await client.calendar.calendarEvent.create(payload, lark.withUserAccessToken(token));
     return code === 0 ? { data, msg, code } : { code: 10001, msg: '登录错误' };
@@ -33,7 +33,7 @@ export const createCalendarEvent = async (payload: any, token: string): Promise<
   }
 };
 
-export const getCalendarEvents = async (calendarId: string, token: string): Promise<ResData> => {
+export const getCalendarEvents = async (calendarId: string, token: string): Promise<IResData> => {
   try {
     const { data, code, msg } = await client.calendar.calendarEvent.list(
       {

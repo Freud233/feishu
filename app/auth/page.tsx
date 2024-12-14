@@ -1,7 +1,7 @@
 'use client';
 
 import { getLarkCalendar } from '@/actions';
-import { userLogin } from '@/actions/auth';
+import { getLarkAccessToken } from '@/actions/auth';
 import { getClockifyUserInfo } from '@/actions/clockify';
 import { useClockifyStore, useLarkStore } from '@/store';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,7 +16,7 @@ const AuthPage = () => {
   const { updateClockifyUserId, updateWorkspaceId } = useClockifyStore();
   const onLoginHandle = async () => {
     // 获取飞书用户信息
-    const { data, code: resCode, msg } = await userLogin(code);
+    const { data, code: resCode, msg } = await getLarkAccessToken(code);
     console.log('🚀 ~ onLoginHandle ~ data:', data);
     if (resCode != 0) {
       toast.warning(msg);
@@ -26,6 +26,7 @@ const AuthPage = () => {
       updateToken(data.access_token);
       updateRefreshToken(data.refresh_token);
       updateTokenExpiredAt(new Date().getTime() + data.expires_in * 1000);
+      // updateTokenExpiredAt(new Date().getTime() + 10 * 1000);
       updateIsTokenExpired();
       const larkCalendarData = await getLarkCalendar(data.access_token);
       const cls = larkCalendarData?.data?.calendars;

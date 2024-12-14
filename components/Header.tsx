@@ -1,15 +1,24 @@
 import { getUserInfo } from '@/actions';
+import { getLarkRefreshToken } from '@/actions/auth';
 import { useLarkStore, useUserInfoStore } from '@/store';
 import { Avatar, Button } from '@nextui-org/react';
 import { signIn } from 'next-auth/react';
 import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 const Header = () => {
-  const { token, tokenExpiredAt } = useLarkStore();
   const { updateAvatarUrl, updateUserId, updateUsername, avatarUrl, userId, username } = useUserInfoStore();
-  const { updateToken } = useLarkStore();
+  const {
+    updateToken,
+    updateRefreshToken,
+    updateTokenExpiredAt,
+    updateIsTokenExpired,
+    token,
+    tokenExpiredAt,
+    refreshToken,
+  } = useLarkStore();
   const isExpired = () => {
-    return new Date().getTime() < tokenExpiredAt;
+    return new Date().getTime() > tokenExpiredAt;
   };
   const onSignOutHandle = () => {
     sessionStorage.clear();
@@ -18,21 +27,36 @@ const Header = () => {
     updateAvatarUrl('');
     updateUserId('');
     updateUsername('');
+
     console.log(userId, 'id');
   };
+
   useEffect(() => {
+    console.log('🚀 ~ isExpired ~ isExpired:', isExpired());
+    console.log(token, refreshToken, 'token', 'refresh token');
     if (isExpired()) {
-      console.log(123);
+      getLarkRefreshToken(token, refreshToken).then((res) => {
+        if (!token || !refreshToken) return;
+        const { code, msg, data } = res;
+        console.log('🚀 ~ getLarkRefreshToken ~ data:', data);
+        updateToken(data?.access_token);
+        updateRefreshToken(data?.refresh_token);
+        updateTokenExpiredAt(new Date().getTime() + data.expires_in * 1000);
+        // updateTokenExpiredAt(new Date().getTime() + 10 * 1000);
+        updateIsTokenExpired();
+        toast.success(msg);
+      });
+    } else {
       if (!userId) {
         if (!token) return;
         getUserInfo(token).then((res) => {
-          const { data } = res;
+          const { data, code } = res;
+          console.log('🚀 ~ getUserInfo ~ code:', code);
           if (res.code === 0) {
             updateUsername(data?.name);
             updateAvatarUrl(data?.avatar_url);
             updateUserId(data?.user_id);
           }
-          console.log('🚀 ~ getUserInfo ~ res:', res);
         });
       }
     }

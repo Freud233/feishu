@@ -4,6 +4,7 @@ import { Button, Input, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
+import { toast } from 'react-toastify';
 export default function MyTimer({
   calendarId,
   token,
@@ -52,9 +53,16 @@ export default function MyTimer({
       end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
     });
     console.log('🚀 ~ onPauseHandle ~ data:', data);
+    const { code, msg } = data;
+    if (code === 0) {
+      toast.success('创建日程成功', { position: 'bottom-right' });
+    } else {
+      toast.warning('创建日程失败', { position: 'bottom-right' });
+    }
     console.log('🚀 ~ onPauseHandle ~ res:', res);
   };
   const onStartHandle = async () => {
+    if (!userId) return toast.warning('请先登录', { position: 'bottom-right' });
     setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'));
     setStartTime(Math.floor(dayjs().valueOf() / 1000));
     start();
@@ -75,7 +83,7 @@ export default function MyTimer({
           </Button>
         ) : (
           <Tooltip content="请先登录" color="danger" className={userId ? 'hidden' : 'block'}>
-            <Button onClick={onStartHandle} color="success" disabled={userId ? false : true}>
+            <Button onClick={onStartHandle} color="success">
               Start
             </Button>
           </Tooltip>
