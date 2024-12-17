@@ -9,7 +9,7 @@ import { IClockifyProject } from '@/type/store';
 import { Button, Link, Select, SelectItem } from '@nextui-org/react';
 import { useState } from 'react';
 export default function Home() {
-  const { token, calendarId } = useLarkStore();
+  const { token, calendarId, refreshToken, tokenExpiredAt } = useLarkStore();
   const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore();
   const [projectId, setProjectId] = useState<string>('');
   const [color, setColor] = useState(0);
@@ -91,7 +91,6 @@ export default function Home() {
         <div className="flex flex-col gap-2 rounded-xl">
           {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
           <MyTimer
-            token={token}
             userId={userId || ''}
             calendarId={calendarId}
             workspaceId={workspaceId}

@@ -1,5 +1,7 @@
 import { createCalendarEvent } from '@/actions';
+import { getLarkRefreshToken } from '@/actions/auth';
 import { createTimeEntries } from '@/actions/clockify';
+import { useLarkStore } from '@/store';
 import { Button, Input, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
@@ -7,14 +9,12 @@ import { useStopwatch } from 'react-timer-hook';
 import { toast } from 'react-toastify';
 export default function MyTimer({
   calendarId,
-  token,
-  workspaceId,
   projectId,
   color,
   userId,
+  workspaceId,
 }: {
   calendarId: string;
-  token: string;
   workspaceId: string;
   projectId: string;
   color: number;
@@ -24,9 +24,30 @@ export default function MyTimer({
   const [clockifyStartTime, setClockifyStartTime] = useState('');
   const [title, setTitle] = useState('');
   const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({});
+  const {
+    token,
+    tokenExpiredAt,
+    refreshToken,
+    updateToken,
+    updateRefreshToken,
+    updateIsTokenExpired,
+    updateTokenExpiredAt,
+  } = useLarkStore();
   const onPauseHandle = async () => {
     pause();
+    console.log('token时间过期');
     if (!startTime || !calendarId || !token) return;
+    if (Date.now() > tokenExpiredAt) {
+      const res = await getLarkRefreshToken(token, refreshToken);
+      console.log('🚀 ~ onPauseHandle ~ res:', res);
+      const { data, msg } = res;
+      updateToken(data?.access_token);
+      updateRefreshToken(data?.refresh_token);
+      updateTokenExpiredAt(new Date().getTime() + data.expires_in * 1000);
+      // updateTokenExpiredAt(new Date().getTime() + 10 * 1000);
+      updateIsTokenExpired();
+      toast.success(msg);
+    }
     const endTime = startTime + totalSeconds + '';
     const data = await createCalendarEvent(
       {
@@ -44,7 +65,7 @@ export default function MyTimer({
           calendar_id: calendarId,
         },
       },
-      token,
+      useLarkStore.getState().token,
     );
     const res = await createTimeEntries(workspaceId, {
       description: title,
