@@ -1,19 +1,32 @@
 'use client';
-import { getAllProject, getTimeEntries } from '@/actions/clockify';
+import { createClockifyProject, getAllProject, getTimeEntries } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
 import { LARK_LOGIN_URL } from '@/constants';
 import { hexToRgbInt32 } from '@/lib';
-import { useClockifyStore, useLarkStore, useUserInfoStore } from '@/store';
+import { useClockifyStore } from '@/store';
 import { IClockifyProject } from '@/type/store';
-import { Button, Link, Select, SelectItem } from '@nextui-org/react';
-import { useState } from 'react';
+import {
+  Button,
+  Input,
+  Link,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  useDisclosure,
+} from '@nextui-org/react';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 export default function Home() {
-  const { token, calendarId } = useLarkStore();
-  const { workspaceId, clockifyUserId, projectData, updateProjectData } = useClockifyStore();
-  const [projectId, setProjectId] = useState<string>('');
+  const { workspaceId, clockifyUserId, projectData, updateProjectData, updateProjectId, projectId } =
+    useClockifyStore();
   const [color, setColor] = useState(0);
-  const { userId } = useUserInfoStore();
+  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [projectName, setProjectName] = useState('');
   // const onGetLarkCalendarHandle = async () => {
   //   const data = await getLarkCalendar(token);
   //   const cls = data?.data?.calendars;
@@ -32,33 +45,48 @@ export default function Home() {
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data);
     updateProjectData(data);
   };
-
+  useEffect(() => {
+    onGetAllProjectHandle();
+  }, [clockifyUserId]);
   const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
     return (
-      <>
-        <Select
-          label="项目"
-          color="success"
-          selectedKeys={[projectId]}
-          className="max-w-xl"
-          onSelectionChange={(e) => {
-            console.log(e.currentKey);
-            const colorArr = data.filter((i) => {
-              if (i.id == e.currentKey) {
-                return i.color;
-              }
-            });
-            setColor(hexToRgbInt32(colorArr[0]?.color) || 0);
-            setProjectId(e.currentKey || '');
-          }}
-        >
-          {data.map((item) => (
-            <SelectItem key={item.id}>{item.name}</SelectItem>
-          ))}
-        </Select>
-      </>
+      <Select
+        label="项目"
+        color="success"
+        selectedKeys={[projectId]}
+        className="max-w-xl"
+        onSelectionChange={(e) => {
+          console.log(e.currentKey);
+          const colorArr = projectData.filter((i) => {
+            if (i.id == e.currentKey) {
+              return i.color;
+            }
+          });
+          setColor(hexToRgbInt32(colorArr[0]?.color) || 0);
+          updateProjectId(e.currentKey || '');
+        }}
+      >
+        {data.map((item) => (
+          <SelectItem key={item.id}>{item.name}</SelectItem>
+        ))}
+      </Select>
     );
   };
+
+  const addClockifyProject = async () => {
+    console.log(projectName, 'projectName');
+    if (!projectName || !projectName.length) return toast.warning('请输入正确名字');
+    if (projectData.some((item) => item.name == projectName)) return toast.error('项目名已存在');
+    const res = await createClockifyProject(workspaceId, projectName);
+    if (res) {
+      toast.success('增加项目成功');
+      await onGetAllProjectHandle();
+    } else {
+      toast.warning('添加项目错误');
+    }
+    onClose();
+  };
+
   return (
     <div className="h-screen">
       <Header></Header>
@@ -82,23 +110,46 @@ export default function Home() {
             获取所有项目
           </Button>
         </div>
-        <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
+        {/* <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
           <div>TOKEN: {token}</div>
           <div>日历ID: {calendarId}</div>
           <div>工作区ID: {workspaceId}</div>
           <div>clockify用户ID: {clockifyUserId}</div>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl">
-          {projectData && projectData.length > 0 && <ProjectRender data={projectData} />}
-          <MyTimer
-            userId={userId || ''}
-            calendarId={calendarId}
-            workspaceId={workspaceId}
-            projectId={projectId}
-            color={color}
-          />
+        </div> */}
+        <div className="flex h-14 flex-col gap-2 rounded-xl">
+          {projectData && projectData.length > 0 && (
+            <div className="flex items-center gap-2">
+              <ProjectRender data={projectData} />
+              <Button className="h-full bg-jade-100" onPress={onOpen}>
+                添加
+              </Button>
+            </div>
+          )}
+          <MyTimer color={color} />
         </div>
       </div>
+      {/* 新增项目modal */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+        <ModalContent>
+          <ModalHeader>添加项目</ModalHeader>
+          <ModalBody>
+            <Input
+              color="success"
+              placeholder="输入项目名"
+              value={projectName}
+              onValueChange={(e) => setProjectName(e)}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" color="danger" onPress={onClose}>
+              取消
+            </Button>
+            <Button color="success" onPress={addClockifyProject}>
+              确定
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

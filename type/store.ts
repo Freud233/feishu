@@ -28,9 +28,11 @@ export type IClockifyStore = {
   workspaceId: string;
   clockifyUserId: string;
   projectData: IClockifyProject[];
+  projectId: string;
   updateWorkspaceId: (id: string) => void;
   updateClockifyUserId: (id: string) => void;
   updateProjectData: (newArr: IClockifyProject[]) => void;
+  updateProjectId: (id: string) => void;
 };
 
 export interface IClockifyProject {

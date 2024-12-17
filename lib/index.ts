@@ -1,5 +1,6 @@
 const hexToRgbInt32 = (hex: string) => {
   // 去掉前导的 '#'
+  if (hex.length < 1) return;
   hex = hex.slice(1);
 
   // 解析 RGB 分量

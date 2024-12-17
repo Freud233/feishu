@@ -58,6 +58,7 @@ const useClockifyStore = create<IClockifyStore>()(
           workspaceId: '',
           clockifyUserId: '',
           projectData: [],
+          projectId: '',
           updateWorkspaceId: (newId: string) =>
             set((state: IClockifyStore) => {
               state.workspaceId = newId;
@@ -70,6 +71,11 @@ const useClockifyStore = create<IClockifyStore>()(
             set((state: Partial<IClockifyStore>) => {
               state.projectData = newArr;
             }),
+          updateProjectId(id) {
+            set((state) => {
+              state.projectId = id;
+            });
+          },
         }),
         {
           name: 'clockify-store',

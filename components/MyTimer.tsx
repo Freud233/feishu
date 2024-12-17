@@ -1,25 +1,13 @@
 import { createCalendarEvent } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { createTimeEntries } from '@/actions/clockify';
-import { useLarkStore } from '@/store';
+import { useClockifyStore, useLarkStore } from '@/store';
 import { Button, Input, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
 import { toast } from 'react-toastify';
-export default function MyTimer({
-  calendarId,
-  projectId,
-  color,
-  userId,
-  workspaceId,
-}: {
-  calendarId: string;
-  workspaceId: string;
-  projectId: string;
-  color: number;
-  userId: string;
-}) {
+export default function MyTimer({ color }: { color: number }) {
   const [startTime, setStartTime] = useState<number>();
   const [clockifyStartTime, setClockifyStartTime] = useState('');
   const [title, setTitle] = useState('');
@@ -32,10 +20,11 @@ export default function MyTimer({
     updateRefreshToken,
     updateIsTokenExpired,
     updateTokenExpiredAt,
+    calendarId,
   } = useLarkStore();
+  const { workspaceId, clockifyUserId: userId, projectId } = useClockifyStore();
   const onPauseHandle = async () => {
     pause();
-    console.log('token时间过期');
     if (!startTime || !calendarId || !token) return;
     if (Date.now() > tokenExpiredAt) {
       const res = await getLarkRefreshToken(token, refreshToken);
