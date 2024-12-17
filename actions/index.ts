@@ -2,7 +2,7 @@
 import { client } from '@/lark-sdk';
 import { IResData } from '@/type/response';
 import * as lark from '@larksuiteoapi/node-sdk';
-export const getLarkCalendar = async (token: string): Promise<IResData> => {
+const getLarkCalendar = async (token: string): Promise<IResData> => {
   console.log('🚀 ~ getCalendar ~ openId:', token);
   try {
     if (!token)
@@ -24,7 +24,7 @@ export const getLarkCalendar = async (token: string): Promise<IResData> => {
   }
 };
 
-export const createCalendarEvent = async (payload: any, token: string): Promise<IResData> => {
+const createCalendarEvent = async (payload: any, token: string): Promise<IResData> => {
   try {
     const { code, data, msg } = await client.calendar.calendarEvent.create(payload, lark.withUserAccessToken(token));
     return code === 0 ? { data, msg, code } : { code: 10001, msg: '登录错误' };
@@ -33,7 +33,7 @@ export const createCalendarEvent = async (payload: any, token: string): Promise<
   }
 };
 
-export const getCalendarEvents = async (calendarId: string, token: string): Promise<IResData> => {
+const getCalendarEvents = async (calendarId: string, token: string): Promise<IResData> => {
   try {
     const { data, code, msg } = await client.calendar.calendarEvent.list(
       {
@@ -49,7 +49,7 @@ export const getCalendarEvents = async (calendarId: string, token: string): Prom
   }
 };
 
-export const getUserInfo = async (token: string) => {
+const getUserInfo = async (token: string) => {
   try {
     const { code, data, msg } = await client.authen.userInfo.get({}, lark.withUserAccessToken(token));
     return code === 0 ? { data, msg, code } : { code: 10001, msg: '获取用户信息错误' };
@@ -57,3 +57,5 @@ export const getUserInfo = async (token: string) => {
     throw error;
   }
 };
+export { createCalendarEvent, getCalendarEvents, getLarkCalendar, getUserInfo };
+

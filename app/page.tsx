@@ -1,15 +1,13 @@
 'use client';
-import { createClockifyProject, getAllProject, getTimeEntries } from '@/actions/clockify';
+import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
-import { LARK_LOGIN_URL } from '@/constants';
 import { hexToRgbInt32 } from '@/lib';
 import { useClockifyStore } from '@/store';
 import { IClockifyProject } from '@/type/store';
 import {
   Button,
   Input,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -35,12 +33,13 @@ export default function Home() {
   //     updateCalendarId(id);
   //   }
   // };
-  const onGetTimeEntriesHandle = async () => {
-    const data = await getTimeEntries(clockifyUserId, workspaceId);
-    console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data);
-  };
+  // const onGetTimeEntriesHandle = async () => {
+  //   const data = await getTimeEntries(clockifyUserId, workspaceId);
+  //   console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data);
+  // };
 
   const onGetAllProjectHandle = async () => {
+    if (!workspaceId) return;
     const data = await getAllProject(workspaceId);
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data);
     updateProjectData(data);
@@ -91,10 +90,10 @@ export default function Home() {
     <div className="h-screen">
       <Header></Header>
       <div className="flex flex-col gap-4 p-4 md:flex-row">
-        <div className="col-span-1 flex flex-col gap-2 rounded-xl p-2 leading-10">
-          {/* <Button onClick={onGetLarkCalendarHandle} variant="ghost" color="primary">
+        {/* <div className="col-span-1 flex flex-col gap-2 rounded-xl p-2 leading-10">
+          <Button onClick={onGetLarkCalendarHandle} variant="ghost" color="primary">
             获取日历列表
-          </Button> */}
+          </Button>
           <Button
             as={Link}
             href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}
@@ -109,7 +108,7 @@ export default function Home() {
           <Button variant="ghost" color="secondary" onClick={onGetAllProjectHandle}>
             获取所有项目
           </Button>
-        </div>
+        </div> */}
         {/* <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
           <div>TOKEN: {token}</div>
           <div>日历ID: {calendarId}</div>

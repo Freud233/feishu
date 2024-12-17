@@ -3,7 +3,7 @@ import { signIn } from '@/auth';
 import { client } from '@/lark-sdk';
 import { IResData } from '@/type/response';
 
-export const getLarkAccessToken = async (verifyCode: string): Promise<IResData> => {
+const getLarkAccessToken = async (verifyCode: string): Promise<IResData> => {
   if (!verifyCode) {
     return {
       code: 10004,
@@ -19,7 +19,7 @@ export const getLarkAccessToken = async (verifyCode: string): Promise<IResData> 
   return code === 0
     ? {
         code: 0,
-        msg: '登录成功',
+        msg,
         data,
       }
     : {
@@ -28,7 +28,7 @@ export const getLarkAccessToken = async (verifyCode: string): Promise<IResData> 
       };
 };
 
-export const getLarkRefreshToken = async (accessToken: string, refresh_token: string): Promise<IResData> => {
+const getLarkRefreshToken = async (accessToken: string, refresh_token: string): Promise<IResData> => {
   try {
     if (!accessToken || !refresh_token)
       return {
@@ -50,10 +50,13 @@ export const getLarkRefreshToken = async (accessToken: string, refresh_token: st
     throw error;
   }
 };
-export const onGithubLoginHandle = async () => {
+const onGithubLoginHandle = async () => {
   await signIn('github');
 };
 
-export const onLarkLoginHandle = async () => {
+const onLarkLoginHandle = async () => {
   await signIn('lark');
 };
+
+export { getLarkAccessToken, getLarkRefreshToken, onGithubLoginHandle, onLarkLoginHandle };
+

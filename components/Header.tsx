@@ -1,8 +1,8 @@
 import { getUserInfo } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
+import { LARK_LOGIN_URL } from '@/constants';
 import { useLarkStore, useUserInfoStore } from '@/store';
-import { Avatar, Button } from '@nextui-org/react';
-import { signIn } from 'next-auth/react';
+import { Avatar, Button, Link } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
@@ -68,13 +68,13 @@ const Header = () => {
         <div className="flex items-center gap-3">
           <Avatar color="primary" src={avatarUrl || undefined} alt={userId} />
           <span>{username}</span>
-          <Button color="success" className="text-jade-50" onClick={onSignOutHandle} size="sm">
+          <Button color="danger" className="text-jade-50" onClick={onSignOutHandle} size="sm">
             退出登录
           </Button>
         </div>
       ) : (
-        <Button color="success" className="text-xl text-jade-50" onClick={() => signIn()}>
-          登录
+        <Button as={Link} href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`} color="secondary">
+          飞书登录
         </Button>
       )}
     </div>
