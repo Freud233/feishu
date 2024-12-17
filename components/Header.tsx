@@ -60,7 +60,7 @@ const Header = () => {
         });
       }
     }
-  });
+  }, [token, userId, refreshToken, tokenExpiredAt]);
   return (
     <div className="m-auto flex h-16 items-center justify-between bg-jade-100 p-2">
       <div className="text-2xl font-semibold text-jade-950">LOGO</div>
