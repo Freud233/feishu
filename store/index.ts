@@ -160,6 +160,10 @@ const useCalendarDescriptionStore = create<ICalendarDescriptionStore>()(
           description: [],
           updateDescription: (title: string) =>
             set((state) => {
+              if (state.description.includes(title)) return;
+              if (state.description.length > 4) {
+                state.description.shift();
+              }
               state.description.push(title);
             }),
           initDescription: () => {
