@@ -1,7 +1,7 @@
 import { getUserInfo } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { LARK_LOGIN_URL } from '@/constants';
-import { useLarkStore, useUserInfoStore } from '@/store';
+import { useCalendarDescriptionStore, useLarkStore, useUserInfoStore } from '@/store';
 import { Avatar, Button, Link } from '@nextui-org/react';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
@@ -17,6 +17,7 @@ const Header = () => {
     tokenExpiredAt,
     refreshToken,
   } = useLarkStore();
+  const { initDescription } = useCalendarDescriptionStore();
   const isExpired = () => {
     return new Date().getTime() > tokenExpiredAt;
   };
@@ -27,13 +28,11 @@ const Header = () => {
     updateAvatarUrl('');
     updateUserId('');
     updateUsername('');
-
+    initDescription();
     console.log(userId, 'id');
   };
 
   useEffect(() => {
-    console.log('🚀 ~ isExpired ~ isExpired:', isExpired());
-    console.log(token, refreshToken, 'token', 'refresh token');
     if (isExpired()) {
       getLarkRefreshToken(token, refreshToken).then((res) => {
         if (!token || !refreshToken) return;

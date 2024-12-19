@@ -1,8 +1,8 @@
 import { createCalendarEvent } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { createTimeEntries } from '@/actions/clockify';
-import { useClockifyStore, useLarkStore } from '@/store';
-import { Button, Input, Tooltip } from '@nextui-org/react';
+import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
+import { Button, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
@@ -10,7 +10,6 @@ import { toast } from 'react-toastify';
 export default function MyTimer({ color }: { color: number }) {
   const [startTime, setStartTime] = useState<number>();
   const [clockifyStartTime, setClockifyStartTime] = useState('');
-  const [title, setTitle] = useState('');
   const { totalSeconds, seconds, minutes, hours, isRunning, start, pause, reset } = useStopwatch({});
   const {
     token,
@@ -23,6 +22,7 @@ export default function MyTimer({ color }: { color: number }) {
     calendarId,
   } = useLarkStore();
   const { workspaceId, clockifyUserId: userId, projectId } = useClockifyStore();
+  const { updateDescription } = useCalendarDescriptionStore();
   const onPauseHandle = async () => {
     pause();
     if (!startTime || !calendarId || !token) return;
@@ -41,7 +41,7 @@ export default function MyTimer({ color }: { color: number }) {
     const data = await createCalendarEvent(
       {
         data: {
-          summary: title,
+          summary: useCalendarStore.getState().title,
           color,
           start_time: {
             timestamp: startTime + '',
@@ -57,7 +57,7 @@ export default function MyTimer({ color }: { color: number }) {
       useLarkStore.getState().token,
     );
     const res = await createTimeEntries(workspaceId, {
-      description: title,
+      description: useCalendarStore.getState().title,
       start: clockifyStartTime,
       projectId: projectId || undefined,
       end: dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
@@ -66,6 +66,7 @@ export default function MyTimer({ color }: { color: number }) {
     const { code } = data;
     if (code === 0) {
       toast.success('创建日程成功', { position: 'bottom-right' });
+      updateDescription(useCalendarStore.getState().title);
     } else {
       toast.warning('创建日程失败', { position: 'bottom-right' });
     }
@@ -78,8 +79,7 @@ export default function MyTimer({ color }: { color: number }) {
     start();
   };
   return (
-    <div className="flex w-full flex-col gap-2 rounded-xl bg-jade-200 p-4">
-      <Input color="success" value={title} onChange={(e) => setTitle(e.target.value)} />
+    <div className="flex w-full flex-col gap-2 rounded-xl bg-jade-100 p-4">
       <p>Timer Demo</p>
       <p>总时间: {totalSeconds}</p>
       <div style={{ fontSize: '100px' }}>
@@ -92,7 +92,7 @@ export default function MyTimer({ color }: { color: number }) {
             Pause
           </Button>
         ) : (
-          <Tooltip content="请先登录" color="danger" className={userId ? 'hidden' : 'block'}>
+          <Tooltip content="请先登录" color="danger" className={userId ? 'block' : 'hidden'}>
             <Button onClick={onStartHandle} color="success">
               Start
             </Button>
@@ -100,6 +100,8 @@ export default function MyTimer({ color }: { color: number }) {
         )}
         <Button
           onClick={() => {
+            if (!userId) return toast.warning('请先登录', { position: 'bottom-right' });
+
             setStartTime(Math.floor(dayjs().valueOf() / 1000));
             setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'));
             reset();

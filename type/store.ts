@@ -104,3 +104,14 @@ export interface Calendar {
   summary_alias: string;
   type: string;
 }
+
+export type ICalendarStore = {
+  title: string;
+  updateTitle: (newTitle: string) => void;
+};
+
+export type ICalendarDescriptionStore = {
+  description: string[];
+  updateDescription: (value: string) => void;
+  initDescription: () => void;
+};

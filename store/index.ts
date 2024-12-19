@@ -1,4 +1,11 @@
-import { IClockifyProject, IClockifyStore, ILarkStore, IUserInfo } from '@/type/store';
+import {
+  ICalendarDescriptionStore,
+  ICalendarStore,
+  IClockifyProject,
+  IClockifyStore,
+  ILarkStore,
+  IUserInfo,
+} from '@/type/store';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
@@ -125,5 +132,46 @@ const useUserInfoStore = create<IUserInfo>()(
   ),
 );
 
-export { useClockifyStore, useLarkStore, useUserInfoStore };
+const useCalendarStore = create<ICalendarStore>()(
+  devtools(
+    immer(
+      persist(
+        (set) => ({
+          title: '',
+          updateTitle: (newTitle: string) =>
+            set((state) => {
+              state.title = newTitle;
+            }),
+        }),
+        {
+          name: 'calendar-store',
+          storage: createJSONStorage(() => localStorage),
+        },
+      ),
+    ),
+  ),
+);
+
+const useCalendarDescriptionStore = create<ICalendarDescriptionStore>()(
+  devtools(
+    immer(
+      persist(
+        (set) => ({
+          description: [],
+          updateDescription: (title: string) =>
+            set((state) => {
+              state.description.push(title);
+            }),
+          initDescription: () => {
+            set((state) => {
+              state.description = [];
+            });
+          },
+        }),
+        { name: 'calendar-title-array', storage: createJSONStorage(() => localStorage) },
+      ),
+    ),
+  ),
+);
+export { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore, useUserInfoStore };
 

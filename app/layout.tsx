@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-w-[400px]">
+      <body className="min-w-[375px]">
         <SessionProvider>
           <ToastContainer />
           <Providers>{children}</Providers>

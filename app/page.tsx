@@ -3,7 +3,7 @@ import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
 import { hexToRgbInt32 } from '@/lib';
-import { useClockifyStore } from '@/store';
+import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore } from '@/store';
 import { IClockifyProject } from '@/type/store';
 import {
   Button,
@@ -25,6 +25,8 @@ export default function Home() {
   const [color, setColor] = useState(0);
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [projectName, setProjectName] = useState('');
+  const { title, updateTitle } = useCalendarStore();
+  const { description } = useCalendarDescriptionStore();
   // const onGetLarkCalendarHandle = async () => {
   //   const data = await getLarkCalendar(token);
   //   const cls = data?.data?.calendars;
@@ -124,6 +126,21 @@ export default function Home() {
               </Button>
             </div>
           )}
+          <datalist id="project">
+            {description &&
+              description.map((item) => (
+                <option value={item} key={item}>
+                  {item}
+                </option>
+              ))}
+          </datalist>
+          <Input
+            color="primary"
+            value={title}
+            placeholder="输入标题"
+            onValueChange={(e) => updateTitle(e)}
+            list="project"
+          />
           <MyTimer color={color} />
         </div>
       </div>
