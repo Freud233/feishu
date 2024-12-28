@@ -21,7 +21,7 @@ export default function MyTimer({ color }: { color: number }) {
     updateTokenExpiredAt,
     calendarId,
   } = useLarkStore();
-  const { workspaceId, clockifyUserId: userId, projectId } = useClockifyStore();
+  const { workspaceId, clockifyUserId: userId, projectId, projectData } = useClockifyStore();
   const { updateDescription } = useCalendarDescriptionStore();
   const onPauseHandle = async () => {
     pause();
@@ -41,7 +41,9 @@ export default function MyTimer({ color }: { color: number }) {
     const data = await createCalendarEvent(
       {
         data: {
-          summary: useCalendarStore.getState().title,
+          summary:
+            projectData &&
+            projectData.filter((item) => item.id == projectId)[0].name + '-' + useCalendarStore.getState().title,
           color,
           start_time: {
             timestamp: startTime + '',
@@ -92,7 +94,7 @@ export default function MyTimer({ color }: { color: number }) {
             Pause
           </Button>
         ) : (
-          <Tooltip content="请先登录" color="danger" className={userId ? 'block' : 'hidden'}>
+          <Tooltip content="请先登录" color="danger" className={userId ? 'hidden' : 'block'}>
             <Button onClick={onStartHandle} color="success">
               Start
             </Button>
