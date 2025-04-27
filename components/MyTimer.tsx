@@ -4,7 +4,7 @@ import { createTimeEntries } from '@/actions/clockify';
 import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
 import { Button, Tooltip } from '@nextui-org/react';
 import dayjs from 'dayjs';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
 import { toast } from 'react-toastify';
 export default function MyTimer({ color }: { color: number }) {
@@ -80,6 +80,29 @@ export default function MyTimer({ color }: { color: number }) {
     setStartTime(Math.floor(dayjs().valueOf() / 1000));
     start();
   };
+
+  const [hasNotified, setHasNotified] = useState(false);
+  // 监听totalSeconds的变化
+  useEffect(() => {
+    if (totalSeconds === 5 && !hasNotified) {
+      // 处理浏览器通知
+      const notify = () => {
+        new Notification('时间提醒', {
+          body: '已经工作30分钟啦，该休息一下了！'
+        });
+        setHasNotified(true);
+      };
+
+      // 检查通知权限
+      if (Notification.permission === 'granted') {
+        notify();
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') notify();
+        });
+      }
+    }
+  }, [totalSeconds, hasNotified]);
   return (
     <div className="flex w-full flex-col gap-2 rounded-xl bg-jade-100 p-4">
       <p>Timer Demo</p>
@@ -103,7 +126,7 @@ export default function MyTimer({ color }: { color: number }) {
         <Button
           onClick={() => {
             if (!userId) return toast.warning('请先登录', { position: 'bottom-right' });
-
+            setHasNotified(false); // 重置通知状态
             setStartTime(Math.floor(dayjs().valueOf() / 1000));
             setClockifyStartTime(dayjs().format('YYYY-MM-DDTHH:mm:ssZ'));
             reset();
