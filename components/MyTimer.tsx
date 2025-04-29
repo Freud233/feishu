@@ -84,7 +84,7 @@ export default function MyTimer({ color }: { color: number }) {
   const [hasNotified, setHasNotified] = useState(false);
   // 监听totalSeconds的变化
   useEffect(() => {
-    if (totalSeconds === 5 && !hasNotified) {
+    if (totalSeconds === 1800 && !hasNotified) {
       // 处理浏览器通知
       const notify = () => {
         new Notification('时间提醒', {
