@@ -57,5 +57,22 @@ const getUserInfo = async (token: string) => {
     throw error;
   }
 };
-export { createCalendarEvent, getCalendarEvents, getLarkCalendar, getUserInfo };
+
+// 获取任务列表
+
+const getTaskList = async (token: string): Promise<IResData> => {
+  if (!token) return { code: 10005, msg: '请先登录' }
+  try {
+    const { code, data, msg } = await client.task.v2.task.list({
+      params: {
+        page_size: 50,
+        completed: false
+      }
+    }, lark.withUserAccessToken(token))
+    return code === 0 ? { data, msg, code } : { code: 10002, msg: '获取任务列表失败' };
+  } catch (error) {
+    throw error
+  }
+}
+export { createCalendarEvent, getCalendarEvents, getLarkCalendar, getTaskList, getUserInfo };
 

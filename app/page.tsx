@@ -1,12 +1,15 @@
 'use client';
+import { getTaskList } from '@/actions';
 import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
 import { hexToRgbInt32 } from '@/lib';
-import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore } from '@/store';
+import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
+import { ILarkTask } from '@/type';
 import { IClockifyProject } from '@/type/store';
 import {
   Button,
+  Checkbox,
   Input,
   Modal,
   ModalBody,
@@ -22,24 +25,24 @@ import { toast } from 'react-toastify';
 export default function Home() {
   const { workspaceId, clockifyUserId, projectData, updateProjectData, updateProjectId, projectId } =
     useClockifyStore();
+  const { token } = useLarkStore()
+  console.log("🚀 ~ Home ~ token:", token)
   const [color, setColor] = useState(0);
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [projectName, setProjectName] = useState('');
   const { title, updateTitle } = useCalendarStore();
   const { description } = useCalendarDescriptionStore();
-  // const onGetLarkCalendarHandle = async () => {
-  //   const data = await getLarkCalendar(token);
-  //   const cls = data?.data?.calendars;
-  //   if (cls) {
-  //     const id = cls[0].calendar?.calendar_id || '';
-  //     updateCalendarId(id);
-  //   }
-  // };
-  // const onGetTimeEntriesHandle = async () => {
-  //   const data = await getTimeEntries(clockifyUserId, workspaceId);
-  //   console.log('🚀 ~ onGetTimeEntriesHandle ~ data:', data);
-  // };
-
+  const [taskList, setTaskList] = useState<ILarkTask[]>()
+  const getTaskListData = async () => {
+    if (!token) return
+    const { data, code, msg } = await getTaskList(token)
+    if (code === 0) {
+      if (data.items) {
+        console.log("🚀 ~ getTaskListData ~ data:", data)
+        setTaskList(data.items)
+      }
+    }
+  }
   const onGetAllProjectHandle = async () => {
     if (!workspaceId) return;
     const data = await getAllProject(workspaceId);
@@ -48,6 +51,7 @@ export default function Home() {
   };
   useEffect(() => {
     onGetAllProjectHandle();
+    getTaskListData()
   }, [clockifyUserId]);
   const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
     return (
@@ -92,31 +96,6 @@ export default function Home() {
     <div className="h-screen">
       <Header></Header>
       <div className="flex flex-col gap-4 p-4 md:flex-row">
-        {/* <div className="col-span-1 flex flex-col gap-2 rounded-xl p-2 leading-10">
-          <Button onClick={onGetLarkCalendarHandle} variant="ghost" color="primary">
-            获取日历列表
-          </Button>
-          <Button
-            as={Link}
-            href={`${process.env.NEXT_PUBLIC_REDIRECT_URL || LARK_LOGIN_URL}`}
-            variant="ghost"
-            color="secondary"
-          >
-            飞书登录
-          </Button>
-          <Button color="success" onClick={onGetTimeEntriesHandle} variant="ghost">
-            获取时间条目
-          </Button>
-          <Button variant="ghost" color="secondary" onClick={onGetAllProjectHandle}>
-            获取所有项目
-          </Button>
-        </div> */}
-        {/* <div className="col-span-2 row-span-2 flex flex-col gap-3 rounded-xl bg-jade-50 p-4">
-          <div>TOKEN: {token}</div>
-          <div>日历ID: {calendarId}</div>
-          <div>工作区ID: {workspaceId}</div>
-          <div>clockify用户ID: {clockifyUserId}</div>
-        </div> */}
         <div className="flex h-14 flex-col gap-2 rounded-xl">
           {projectData && projectData.length > 0 && (
             <div className="flex items-center gap-2">
@@ -142,6 +121,12 @@ export default function Home() {
             list="project"
           />
           <MyTimer color={color} />
+        </div>
+        {/* 未完成任务 */}
+        <div className='flex flex-col gap-2'>
+          {taskList && taskList.map(item => {
+            return <Checkbox key={item.task_id}>{item.summary}</Checkbox>
+          })}
         </div>
       </div>
       {/* 新增项目modal */}

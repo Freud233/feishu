@@ -76,3 +76,196 @@ export interface ICustomField {
   sourceType: string; // 必填项，字段值的来源类型。
   value: string; // 必填项，字段的值。
 }
+
+/**
+ * 飞书任务数据结构
+ */
+export interface ILarkTask {
+  /**
+   * 任务完成时间戳（字符串形式），"0" 表示未完成
+   */
+  completed_at: string;
+
+  /**
+   * 任务创建时间戳（字符串形式）
+   */
+  created_at: string;
+
+  /**
+   * 任务创建者信息
+   */
+  creator: TaskUser;
+
+  /**
+   * 任务依赖列表
+   */
+  dependencies: any[];
+
+  /**
+   * 任务描述
+   */
+  description: string;
+
+  /**
+   * 额外信息字段
+   */
+  extra: string;
+
+  /**
+   * 任务全局唯一标识符
+   */
+  guid: string;
+
+  /**
+   * 是否为里程碑任务
+   */
+  is_milestone: boolean;
+
+  /**
+   * 任务关联成员列表
+   */
+  members: TaskMember[];
+
+  /**
+   * 任务模式（数字类型，含义需参考飞书文档）
+   */
+  mode: number;
+
+  /**
+   * 任务来源信息
+   */
+  origin: TaskOrigin;
+
+  /**
+   * 父任务GUID
+   */
+  parent_task_guid: string;
+
+  /**
+   * 重复规则
+   */
+  repeat_rule: string;
+
+  /**
+   * 任务来源类型（数字类型，含义需参考飞书文档）
+   */
+  source: number;
+
+  /**
+   * 任务状态（todo: 待办, doing: 进行中, done: 已完成等）
+   */
+  status: string;
+
+  /**
+   * 子任务数量
+   */
+  subtask_count: number;
+
+  /**
+   * 任务摘要/标题
+   */
+  summary: string;
+
+  /**
+   * 任务ID
+   */
+  task_id: string;
+
+  /**
+   * 任务所属清单列表
+   */
+  tasklists: any[];
+
+  /**
+   * 任务更新时间戳（字符串形式）
+   */
+  updated_at: string;
+
+  /**
+   * 任务详情页URL
+   */
+  url: string;
+}
+
+/**
+ * 任务用户信息结构
+ */
+interface TaskUser {
+  /**
+   * 用户ID
+   */
+  id: string;
+
+  /**
+   * 用户类型（通常为 "user"）
+   */
+  type: string;
+}
+
+/**
+ * 任务成员信息结构
+ */
+interface TaskMember {
+  /**
+   * 成员ID
+   */
+  id: string;
+
+  /**
+   * 成员角色（assignee: 负责人, follower: 关注者等）
+   */
+  role: string;
+
+  /**
+   * 成员类型（通常为 "user"）
+   */
+  type: string;
+}
+
+/**
+ * 任务来源信息结构
+ */
+interface TaskOrigin {
+  /**
+   * 来源链接信息
+   */
+  href: TaskHref;
+
+  /**
+   * 来源平台多语言名称
+   */
+  platform_i18n_name: TaskI18nNames;
+}
+
+/**
+ * 任务来源链接信息结构
+ */
+interface TaskHref {
+  /**
+   * 链接标题
+   */
+  title: string;
+
+  /**
+   * 链接URL
+   */
+  url: string;
+}
+
+/**
+ * 任务多语言名称结构
+ */
+interface TaskI18nNames {
+  de_de: string;  // 德语
+  en_us: string;  // 美式英语
+  es_es: string;  // 西班牙语
+  fr_fr: string;  // 法语
+  it_it: string;  // 意大利语
+  ja_jp: string;  // 日语
+  ko_kr: string;  // 韩语
+  ru_ru: string;  // 俄语
+  th_th: string;  // 泰语
+  zh_cn: string;  // 简体中文
+  zh_hk: string;  // 繁体中文（香港）
+  zh_tw: string;  // 繁体中文（台湾）
+}
