@@ -1,5 +1,6 @@
 'use server';
 import { client } from '@/lark-sdk';
+import { ILarkTask } from '@/type';
 import { IResData } from '@/type/response';
 import * as lark from '@larksuiteoapi/node-sdk';
 const getLarkCalendar = async (token: string): Promise<IResData> => {
@@ -74,5 +75,28 @@ const getTaskList = async (token: string): Promise<IResData> => {
     throw error
   }
 }
-export { createCalendarEvent, getCalendarEvents, getLarkCalendar, getTaskList, getUserInfo };
+
+// 更新任务
+
+const patchTask = async (newTask: Partial<ILarkTask>, token: string): Promise<IResData> => {
+  console.log("🚀 ~ patchTask ~ summary:", newTask)
+  if (!token) return { code: 10005, msg: '请先登录' }
+  try {
+    const { code, data, msg } = await client.task.v2.task.patch({
+      data: {
+        task: newTask,
+        update_fields: ['completed_at']
+      },
+      path: {
+        task_guid: newTask.guid || ''
+      }
+    }, lark.withUserAccessToken(token))
+    console.log("🚀 ~ patchTask ~ data:", data)
+    return code === 0 ? { data, msg, code } : { code: 10002, msg: '获取任务列表失败' };
+  } catch (error) {
+    throw error
+  }
+
+}
+export { createCalendarEvent, getCalendarEvents, getLarkCalendar, getTaskList, getUserInfo, patchTask };
 

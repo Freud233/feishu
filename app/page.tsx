@@ -1,5 +1,5 @@
 'use client';
-import { getTaskList } from '@/actions';
+import { getTaskList, patchTask } from '@/actions';
 import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
@@ -20,6 +20,7 @@ import {
   SelectItem,
   useDisclosure,
 } from '@nextui-org/react';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 export default function Home() {
@@ -49,9 +50,18 @@ export default function Home() {
     console.log('🚀 ~ onGetAllProjectHandle ~ data:', data);
     updateProjectData(data);
   };
+
+  const onPatchTaskHandle = async (task: ILarkTask) => {
+    if (!token || !task) return
+    const newTask = { ...task, completed_at: dayjs() + '', status: task.status === 'todo' ? 'done' : 'todo' }
+    const { code } = await patchTask(newTask, token)
+    if (code === 0) getTaskListData()
+  }
   useEffect(() => {
     onGetAllProjectHandle();
-    getTaskListData()
+    if (token) {
+      getTaskListData()
+    }
   }, [clockifyUserId]);
   const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
     return (
@@ -125,7 +135,10 @@ export default function Home() {
         {/* 未完成任务 */}
         <div className='flex flex-col gap-2'>
           {taskList && taskList.map(item => {
-            return <Checkbox key={item.task_id}>{item.summary}</Checkbox>
+            return <div key={item.task_id}>
+              <Checkbox onClick={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
+              <p>{item.guid}</p>
+            </div>
           })}
         </div>
       </div>
