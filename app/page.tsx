@@ -37,6 +37,7 @@ export default function Home() {
   const getTaskListData = async () => {
     if (!token) return
     const { data, code, msg } = await getTaskList(token)
+    console.log("🚀 ~ getTaskListData ~ msg:", msg)
     if (code === 0) {
       if (data.items) {
         console.log("🚀 ~ getTaskListData ~ data:", data)
