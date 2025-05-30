@@ -26,8 +26,7 @@ import { toast } from 'react-toastify';
 export default function Home() {
   const { workspaceId, clockifyUserId, projectData, updateProjectData, updateProjectId, projectId } =
     useClockifyStore();
-  const { token } = useLarkStore()
-  console.log("🚀 ~ Home ~ token:", token)
+  const { token, isTokenExpired } = useLarkStore()
   const [color, setColor] = useState(0);
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [projectName, setProjectName] = useState('');
@@ -35,7 +34,7 @@ export default function Home() {
   const { description } = useCalendarDescriptionStore();
   const [taskList, setTaskList] = useState<ILarkTask[]>()
   const getTaskListData = async () => {
-    if (!token) return
+    if (!token || isTokenExpired) return
     const { data, code, msg } = await getTaskList(token)
     console.log("🚀 ~ getTaskListData ~ msg:", msg)
     if (code === 0) {
@@ -107,11 +106,11 @@ export default function Home() {
     <div className="h-screen">
       <Header></Header>
       <div className="flex flex-col gap-4 p-4 md:flex-row">
-        <div className="flex h-14 flex-col gap-2 rounded-xl">
+        <div className="flex flex-col gap-2 rounded-xl">
           {projectData && projectData.length > 0 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 h-full">
               <ProjectRender data={projectData} />
-              <Button className="h-full bg-jade-100" onPress={onOpen}>
+              <Button className="bg-jade-100  h-full" onPress={onOpen}>
                 添加
               </Button>
             </div>
@@ -136,10 +135,7 @@ export default function Home() {
         {/* 未完成任务 */}
         <div className='flex flex-col gap-2'>
           {taskList && taskList.map(item => {
-            return <div key={item.task_id}>
-              <Checkbox onClick={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
-              <p>{item.guid}</p>
-            </div>
+            return <Checkbox key={item.task_id} onClick={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
           })}
         </div>
       </div>
