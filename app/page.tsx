@@ -1,5 +1,5 @@
 'use client';
-import { getTaskList, patchTask } from '@/actions';
+import { createTask, getTaskList, patchTask } from '@/actions';
 import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
@@ -33,6 +33,7 @@ export default function Home() {
   const { title, updateTitle } = useCalendarStore();
   const { description } = useCalendarDescriptionStore();
   const [taskList, setTaskList] = useState<ILarkTask[]>()
+  const [task, setTask] = useState<any>()
   const getTaskListData = async () => {
     if (!token || isTokenExpired) return
     const { data, code, msg } = await getTaskList(token)
@@ -56,6 +57,13 @@ export default function Home() {
     const newTask = { ...task, completed_at: dayjs() + '', status: task.status === 'todo' ? 'done' : 'todo' }
     const { code } = await patchTask(newTask, token)
     if (code === 0) getTaskListData()
+  }
+
+  const onCreateTaskHandle = async () => {
+    if (!token || isTokenExpired || !task) return
+    // id 成员id, role 负责人 assignee 关注人 follower
+    const data = await createTask({ summary: task, members: [{ id: 'ou_a94f013df62163fd13eca73b7ce50a62', role: 'assignee', type: 'user' }] }, token)
+    console.log("🚀 ~ onCreateTaskHandle ~ data:", data)
   }
   useEffect(() => {
     onGetAllProjectHandle();
@@ -133,7 +141,14 @@ export default function Home() {
           <MyTimer color={color} />
         </div>
         {/* 未完成任务 */}
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-4'>
+          <div className='flex gap-2'>
+            <Input isRequired placeholder='输入任务名称' color='secondary' onChange={e => {
+              if (!e.target.value) return
+              setTask(e.target.value)
+            }} isClearable />
+            <Button color='success' onPress={onCreateTaskHandle}>确定</Button>
+          </div>
           {taskList && taskList.map(item => {
             return <Checkbox key={item.task_id} onClick={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
           })}

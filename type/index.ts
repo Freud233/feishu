@@ -124,7 +124,7 @@ export interface ILarkTask {
   /**
    * 任务关联成员列表
    */
-  members: TaskMember[];
+  members: ITaskMember[];
 
   /**
    * 任务模式（数字类型，含义需参考飞书文档）
@@ -205,7 +205,7 @@ interface TaskUser {
 /**
  * 任务成员信息结构
  */
-interface TaskMember {
+export interface ITaskMember {
   /**
    * 成员ID
    */
