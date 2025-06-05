@@ -8,6 +8,7 @@ import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLar
 import { ILarkTask } from '@/type';
 import { IClockifyProject } from '@/type/store';
 import {
+  addToast,
   Button,
   Checkbox,
   Input,
@@ -56,8 +57,15 @@ export default function Home() {
   const onPatchTaskHandle = async (task: ILarkTask) => {
     if (!token || !task) return
     const newTask = { ...task, completed_at: dayjs() + '', status: task.status === 'todo' ? 'done' : 'todo' }
-    const { code } = await patchTask(newTask, token)
-    if (code === 0) getTaskListData()
+    const { code, msg } = await patchTask(newTask, token)
+    console.log("🚀 ~ onPatchTaskHandle ~ msg:", msg)
+    if (code === 0) {
+      addToast({
+        // TODO 换成更美观的动画效果
+        title: '已完成任务',
+      })
+      getTaskListData()
+    }
   }
 
   const onCreateTaskHandle = async () => {
@@ -151,7 +159,7 @@ export default function Home() {
             <Button color='success' onPress={onCreateTaskHandle}>确定</Button>
           </div>
           {taskList && taskList.map(item => {
-            return <Checkbox key={item.task_id} onClick={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
+            return <Checkbox key={item.task_id} onChange={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
           })}
         </div>
       </div>
