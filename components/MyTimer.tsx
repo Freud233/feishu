@@ -2,7 +2,7 @@ import { createCalendarEvent } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { createTimeEntries } from '@/actions/clockify';
 import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
-import { Button, Tooltip } from '@nextui-org/react';
+import { Button, Tooltip } from '@heroui/react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';

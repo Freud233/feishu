@@ -2,7 +2,7 @@ import { getUserInfo } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { LARK_LOGIN_URL } from '@/constants';
 import { useCalendarDescriptionStore, useLarkStore, useUserInfoStore } from '@/store';
-import { Avatar, Button, Link } from '@nextui-org/react';
+import { Avatar, Button, Link } from '@heroui/react';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 

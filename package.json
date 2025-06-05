@@ -15,8 +15,8 @@
     }
   },
   "dependencies": {
+    "@heroui/react": "^2.7.9",
     "@larksuiteoapi/node-sdk": "^1.40.1",
-    "@nextui-org/react": "^2.4.8",
     "axios": "^1.7.8",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.11.17",

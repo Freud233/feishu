@@ -19,23 +19,24 @@ import {
   Select,
   SelectItem,
   useDisclosure,
-} from '@nextui-org/react';
+} from '@heroui/react';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 export default function Home() {
   const { workspaceId, clockifyUserId, projectData, updateProjectData, updateProjectId, projectId } =
     useClockifyStore();
-  const { token, isTokenExpired } = useLarkStore()
+  const { token, isTokenExpired, tokenExpiredAt } = useLarkStore()
   const [color, setColor] = useState(0);
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [projectName, setProjectName] = useState('');
   const { title, updateTitle } = useCalendarStore();
   const { description } = useCalendarDescriptionStore();
   const [taskList, setTaskList] = useState<ILarkTask[]>()
-  const [task, setTask] = useState<any>()
+  const [task, setTask] = useState<string>()
   const getTaskListData = async () => {
     if (!token || isTokenExpired) return
+    console.log("🚀 ~ getTaskListData ~ isTokenExpired:", dayjs(tokenExpiredAt).format())
     const { data, code, msg } = await getTaskList(token)
     console.log("🚀 ~ getTaskListData ~ msg:", msg)
     if (code === 0) {
@@ -80,7 +81,7 @@ export default function Home() {
         className="max-w-xl"
         onSelectionChange={(e) => {
           console.log(e.currentKey);
-          const colorArr = projectData.filter((i) => {
+          const colorArr = projectData.filter((i: { id: string | undefined; color: any; }) => {
             if (i.id == e.currentKey) {
               return i.color;
             }
@@ -99,7 +100,7 @@ export default function Home() {
   const addClockifyProject = async () => {
     console.log(projectName, 'projectName');
     if (!projectName || !projectName.length) return toast.warning('请输入正确名字');
-    if (projectData.some((item) => item.name == projectName)) return toast.error('项目名已存在');
+    if (projectData.some((item: { name: string; }) => item.name == projectName)) return toast.error('项目名已存在');
     const res = await createClockifyProject(workspaceId, projectName);
     if (res) {
       toast.success('增加项目成功');
@@ -125,7 +126,7 @@ export default function Home() {
           )}
           <datalist id="project">
             {description &&
-              description.map((item) => (
+              description.map((item: string) => (
                 <option value={item} key={item}>
                   {item}
                 </option>
