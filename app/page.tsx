@@ -35,7 +35,7 @@ export default function Home() {
   const { description } = useCalendarDescriptionStore();
   const [taskList, setTaskList] = useState<ILarkTask[]>()
   const [task, setTask] = useState<string>()
-  const getTaskListData = async () => {
+  const onGetTaskHandle = async () => {
     if (!token || isTokenExpired) return
     console.log("🚀 ~ getTaskListData ~ isTokenExpired:", dayjs(tokenExpiredAt).format())
     const { data, code, msg } = await getTaskList(token)
@@ -64,7 +64,7 @@ export default function Home() {
         // TODO 换成更美观的动画效果
         title: '已完成任务',
       })
-      getTaskListData()
+      onGetTaskHandle()
     }
   }
 
@@ -76,8 +76,9 @@ export default function Home() {
   }
   useEffect(() => {
     onGetAllProjectHandle();
-    if (token) {
-      getTaskListData()
+    if (token && (tokenExpiredAt > dayjs().unix())) {
+      console.log('token 没有过期');
+      onGetTaskHandle()
     }
   }, [clockifyUserId]);
   const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
@@ -89,7 +90,7 @@ export default function Home() {
         className="max-w-xl"
         onSelectionChange={(e) => {
           console.log(e.currentKey);
-          const colorArr = projectData.filter((i: { id: string | undefined; color: any; }) => {
+          const colorArr = projectData.filter((i: { id: string | undefined; color: any | ''; }) => {
             if (i.id == e.currentKey) {
               return i.color;
             }
