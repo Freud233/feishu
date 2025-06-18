@@ -90,7 +90,7 @@ export default function Home() {
         className="max-w-xl"
         onSelectionChange={(e) => {
           console.log(e.currentKey);
-          const colorArr = projectData.filter((i: { id: string | undefined; color: any | ''; }) => {
+          const colorArr = projectData.filter((i: { id: string | undefined; color: string | ''; }) => {
             if (i.id == e.currentKey) {
               return i.color;
             }
