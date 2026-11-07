@@ -1,93 +1,106 @@
 'use server';
-const CLOCKIFY_BASE_URL = 'https://api.clockify.me/api';
+import { CODE } from '@/constants';
+import { failure, safeAction, success } from '@/lib/result';
 import { ICrateClockifyTimeEntry } from '@/type';
+import { IResData } from '@/type/response';
 import axios from 'axios';
 
+const CLOCKIFY_BASE_URL = 'https://api.clockify.me/api';
+
 const axiosInstance = axios.create({
-  timeout: 1000 * 60,
+  // 原 60s 超时会让失败请求长时间挂起；15s 足以覆盖正常接口调用
+  timeout: 15 * 1000,
   baseURL: CLOCKIFY_BASE_URL,
   headers: {
     'x-api-key': process.env.clockifyKey || '',
   },
 });
+
+/** 所有 Clockify 接口统一返回 { code, msg, data }，异常由 safeAction 收口 */
+const runClockify = async <T>(
+  request: () => Promise<{ data: T }>,
+  fallbackMsg: string,
+): Promise<IResData> =>
+  safeAction(async () => {
+    const { data } = await request();
+    return success(data);
+  }, fallbackMsg);
+
+/** 获取所有工作区 */
+export async function getAllWorkSpaces(): Promise<IResData> {
+  return runClockify(
+    () => axiosInstance.get('/v1/workspaces?roles=WORKSPACE_ADMIN&roles=OWNER'),
+    '获取工作区失败',
+  );
+}
+
+/** 获取 Clockify 用户信息 */
+export async function getClockifyUserInfo(): Promise<IResData> {
+  return runClockify(() => axiosInstance.get('/v1/user'), '获取用户信息失败');
+}
+
+/** 获取指定用户在工作区的时间记录 */
+export async function getTimeEntries(userId: string, workspaceId: string): Promise<IResData> {
+  if (!userId || !workspaceId) return failure(CODE.PARAM, '缺少用户或工作区信息');
+  return runClockify(
+    () =>
+      axiosInstance.get(
+        `/v1/workspaces/${encodeURIComponent(workspaceId)}/user/${encodeURIComponent(userId)}/time-entries`,
+      ),
+    '获取时间记录失败',
+  );
+}
+
+/** 新增时间记录 */
+export async function createTimeEntries(
+  workspaceId: string,
+  payload?: Partial<ICrateClockifyTimeEntry>,
+): Promise<IResData> {
+  if (!workspaceId) return failure(CODE.PARAM, '缺少工作区信息');
+  return runClockify(
+    () =>
+      axiosInstance.post(`/v1/workspaces/${encodeURIComponent(workspaceId)}/time-entries`, payload, {
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    '创建时间记录失败',
+  );
+}
+
+/** 获取工作区下所有项目 */
+export async function getAllProject(workspaceId: string): Promise<IResData> {
+  if (!workspaceId) return failure(CODE.PARAM, '缺少工作区信息');
+  return runClockify(
+    () => axiosInstance.get(`/v1/workspaces/${encodeURIComponent(workspaceId)}/projects`),
+    '获取项目列表失败',
+  );
+}
+
 /**
- * 获取clockify所有工作区
+ * 新增项目。
+ *
+ * 修复：原实现在项目名重复时返回 `{ code: 10005 }`，而调用方只判断 `if (res)`（恒为真），
+ * 会误报「增加项目成功」。现在所有分支统一返回 IResData，由调用方按 code 判断。
  */
-const getAllWorkSpaces = async () => {
-  const { data } = await axiosInstance.get('/v1/workspaces?roles=WORKSPACE_ADMIN&roles=OWNER');
-  console.log('🚀 ~ getAllWorkSpaces ~ data:', data);
-  return data;
-};
-/**
- * 获取用户信息
- *
- * */
-const getClockifyUserInfo = async () => {
-  const { data } = await axiosInstance.get('/v1/user');
-  return data;
-};
+export async function createClockifyProject(
+  workspaceId: string,
+  projectName: string,
+): Promise<IResData> {
+  if (!workspaceId || !projectName?.trim()) return failure(CODE.PARAM, '缺少工作区或项目名');
 
-/**
- * Get time entries for a user on workspace
- * @Param('userId', 用户ID)
- * @Param('workspaceId', 工作区ID)
- * */
+  const projects = await getAllProject(workspaceId);
+  if (projects.code !== CODE.OK) return projects;
 
-const getTimeEntries = async (userId: string, workspaceId: string) => {
-  if (!userId || !workspaceId) return;
-  const { data } = await axiosInstance.get(`/v1/workspaces/${workspaceId}/user/${userId}/time-entries`);
-  return data;
-};
+  const list = (projects.data ?? []) as Array<{ name?: string }>;
+  if (list.some((item) => item.name === projectName.trim())) {
+    return failure(CODE.ACTION, '项目名重复');
+  }
 
-/**
- * Add a new time entry
- *
- * */
-
-const createTimeEntries = async (workspaceId: string, payload?: Partial<ICrateClockifyTimeEntry>) => {
-  const { data } = await axiosInstance.post(`/v1/workspaces/${workspaceId}/time-entries`, payload, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  return data;
-};
-
-/**
- * Get all projects on workspace
- * */
-const getAllProject = async (workspaceId: string) => {
-  if (!workspaceId) return;
-  const { data } = await axiosInstance.get(`/v1/workspaces/${workspaceId}/projects`);
-  return data;
-};
-
-/**
- * Add a new project
- * @requires workspaceId,projectName
- * */
-
-const createClockifyProject = async (workspaceId: string, projectName: string) => {
-  if (!workspaceId || !projectName) return;
-  const res = await getAllProject(workspaceId);
-  if (res.some((item: any) => item.name == projectName))
-    return {
-      code: 10005,
-      msg: '项目名重复',
-    };
-  const { data } = await axiosInstance.post(`/v1/workspaces/${workspaceId}/projects`, {
-    name: projectName,
-    billable: false,
-  });
-  return data;
-};
-
-export {
-  createClockifyProject,
-  createTimeEntries,
-  getAllProject,
-  getAllWorkSpaces,
-  getClockifyUserInfo,
-  getTimeEntries
-};
-
+  return runClockify(
+    () =>
+      axiosInstance.post(`/v1/workspaces/${encodeURIComponent(workspaceId)}/projects`, {
+        name: projectName.trim(),
+        billable: false,
+      }),
+    '添加项目失败',
+  );
+}
