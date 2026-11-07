@@ -4,6 +4,7 @@ import { getLarkCalendar } from '@/actions';
 import { getLarkAccessToken } from '@/actions/auth';
 import { getClockifyUserInfo } from '@/actions/clockify';
 import { CODE } from '@/constants';
+import { Card, TimerIcon } from '@/components/ui/md3';
 import { useClockifyStore, useLarkStore } from '@/store';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -66,7 +67,18 @@ const AuthPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
 
-  return <div>Auth Page</div>;
+  return (
+    <main className="flex min-h-dvh items-center justify-center p-6">
+      <Card variant="elevated" className="flex w-full max-w-sm flex-col items-center gap-4 p-8 text-center">
+        <span className="md-avatar md-avatar--lg bg-md-primary-container text-md-on-primary-container">
+          <TimerIcon />
+        </span>
+        <h1 className="md-type-title-lg">正在完成飞书登录</h1>
+        <p className="md-type-body-md text-md-on-surface-variant">正在同步日历与 Clockify 信息，请稍候…</p>
+        <span className="md-spinner md-spinner--lg mt-2 text-md-primary" aria-label="加载中" />
+      </Card>
+    </main>
+  );
 };
 
 const Auth = () => {

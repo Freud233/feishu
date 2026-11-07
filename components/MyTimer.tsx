@@ -1,14 +1,20 @@
+'use client';
+
 import { createCalendarEvent } from '@/actions';
 import { getLarkRefreshToken } from '@/actions/auth';
 import { createTimeEntries } from '@/actions/clockify';
 import { CODE } from '@/constants';
 import { hasTokenExpired } from '@/lib';
 import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
-import { Button, Tooltip } from '@heroui/react';
+import { Button, LinearProgress, PauseIcon, PlayIcon, ReplayIcon } from '@/components/ui/md3';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
 import { toast } from 'react-toastify';
+
+/** 30 分钟专注提醒阈值，同时作为进度条上限。 */
+const FOCUS_GOAL_SECONDS = 1800;
+const pad = (value: number) => String(value).padStart(2, '0');
 
 export default function MyTimer({ color }: { color: number }) {
   const [startTime, setStartTime] = useState<number>();
@@ -96,7 +102,7 @@ export default function MyTimer({ color }: { color: number }) {
   // 且未授权时每一秒都会重复发起权限申请
   const hasNotifiedRef = useRef(false);
   useEffect(() => {
-    if (totalSeconds < 1800 || hasNotifiedRef.current) return;
+    if (totalSeconds < FOCUS_GOAL_SECONDS || hasNotifiedRef.current) return;
     if (typeof Notification === 'undefined') return;
     hasNotifiedRef.current = true;
 
@@ -123,30 +129,50 @@ export default function MyTimer({ color }: { color: number }) {
     reset();
   };
 
+  const elapsedMinutes = Math.floor(totalSeconds / 60);
+  const elapsedSeconds = totalSeconds % 60;
+
   return (
-    <div className="flex w-full flex-col gap-2 rounded-xl bg-jade-100 p-4">
-      <p>Timer Demo</p>
-      <p>总时间: {totalSeconds}</p>
-      <div style={{ fontSize: '100px' }}>
-        <span>{hours}</span>:<span>{minutes}</span>:<span>{seconds}</span>
+    <section className="md-card md-card--hero flex flex-col p-5 md:p-6">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="md-type-title-md">专注计时</p>
+          <p className="md-type-body-sm mt-1 opacity-75">暂停后自动写入飞书日程与 Clockify</p>
+        </div>
+        <span className="md-chip">
+          <span className="md-chip--dot" />
+          {isRunning ? '计时中' : '未开始'}
+        </span>
       </div>
-      <p>{isRunning ? 'Running' : 'Not running'}</p>
-      <div className="flex gap-2">
+
+      <p className="md-type-display md-tabular my-6 text-center text-[clamp(2.25rem,9vw,3.5625rem)] leading-tight">
+        {pad(hours)}:{pad(minutes)}:{pad(seconds)}
+      </p>
+
+      <div className="mb-2 flex items-center justify-between">
+        <span className="md-type-label-md opacity-75">本次专注</span>
+        <span className="md-type-label-md md-tabular opacity-75">
+          {pad(elapsedMinutes)}:{pad(elapsedSeconds)} / 30:00
+        </span>
+      </div>
+      <LinearProgress value={totalSeconds} max={FOCUS_GOAL_SECONDS} label="30 分钟专注进度" />
+
+      <div className="mt-6 flex flex-wrap gap-3">
         {isRunning ? (
-          <Button onClick={onPauseHandle} color="danger">
-            Pause
+          <Button variant="filled" onClick={onPauseHandle} icon={<PauseIcon />}>
+            暂停并同步
           </Button>
         ) : (
-          <Tooltip content="请先登录" color="danger" className={userId ? 'hidden' : 'block'}>
-            <Button onClick={onStartHandle} color="success">
-              Start
-            </Button>
-          </Tooltip>
+          <Button variant="filled" onClick={onStartHandle} icon={<PlayIcon />} disabled={!userId}>
+            开始计时
+          </Button>
         )}
-        <Button onClick={onResetHandle} color="primary">
-          Reset
+        <Button variant="outlined" onClick={onResetHandle} icon={<ReplayIcon />} disabled={!userId}>
+          重置
         </Button>
       </div>
-    </div>
+
+      {!userId ? <p className="md-type-body-sm mt-3 opacity-75">完成飞书登录后即可开始计时</p> : null}
+    </section>
   );
 }
