@@ -3,6 +3,7 @@
 import { getLarkCalendar } from '@/actions';
 import { getLarkAccessToken } from '@/actions/auth';
 import { getClockifyUserInfo } from '@/actions/clockify';
+import { CODE } from '@/constants';
 import { useClockifyStore, useLarkStore } from '@/store';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -14,43 +15,60 @@ const AuthPage = () => {
   const { updateRefreshToken, updateCalendarId, updateToken, updateTokenExpiredAt, updateIsTokenExpired } =
     useLarkStore();
   const { updateClockifyUserId, updateWorkspaceId } = useClockifyStore();
-  const onLoginHandle = async () => {
-    // 获取飞书用户信息
-    const { data, code: resCode, msg } = await getLarkAccessToken(code);
-    console.log('🚀 ~ onLoginHandle ~ data:', data);
-    if (resCode != 0) {
-      toast.warning(msg);
-      return;
-    }
-    if (data?.access_token) {
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const onLoginHandle = async () => {
+      if (!code) {
+        toast.warning('缺少登录凭证，请重新登录');
+        router.replace('/');
+        return;
+      }
+
+      // 获取飞书用户信息
+      const { data, code: resCode, msg } = await getLarkAccessToken(code);
+      if (cancelled) return;
+      if (resCode !== CODE.OK || !data?.access_token) {
+        toast.warning(msg || '登录失败');
+        router.replace('/');
+        return;
+      }
+
       updateToken(data.access_token);
       updateRefreshToken(data.refresh_token);
-      updateTokenExpiredAt(new Date().getTime() + data.expires_in * 1000);
-      // updateTokenExpiredAt(new Date().getTime() + 10 * 1000);
+      updateTokenExpiredAt(Date.now() + data.expires_in * 1000);
       updateIsTokenExpired();
-      const larkCalendarData = await getLarkCalendar(data.access_token);
-      const cls = larkCalendarData?.data?.calendars;
-      if (cls) {
-        const id = cls[0].calendar?.calendar_id || '';
-        updateCalendarId(id);
-      }
-    }
 
-    // 获取clockify信息
-    const clockifyData = await getClockifyUserInfo();
-    const { id, activeWorkspace } = clockifyData;
-    updateWorkspaceId(activeWorkspace);
-    updateClockifyUserId(id);
-    toast.success(msg);
-  };
-  useEffect(() => {
-    onLoginHandle();
-    setTimeout(() => {
-      router.push('/');
-    }, 3000);
+      const larkCalendarData = await getLarkCalendar(data.access_token);
+      const calendarId = larkCalendarData?.data?.calendars?.[0]?.calendar?.calendar_id || '';
+      if (calendarId) updateCalendarId(calendarId);
+
+      // 获取 Clockify 信息，失败不阻断飞书登录
+      const clockifyRes = await getClockifyUserInfo();
+      if (clockifyRes.code === CODE.OK && clockifyRes.data) {
+        updateWorkspaceId(clockifyRes.data.activeWorkspace ?? '');
+        updateClockifyUserId(clockifyRes.data.id ?? '');
+      }
+
+      if (cancelled) return;
+      toast.success('登录成功');
+      // 原实现无条件 setTimeout 3 秒跳转且不清理定时器；现在登录失败立即返回，跳转可被取消
+      timer = setTimeout(() => router.replace('/'), 1500);
+    };
+
+    void onLoginHandle();
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code]);
+
   return <div>Auth Page</div>;
 };
+
 const Auth = () => {
   return (
     <Suspense>
@@ -58,4 +76,5 @@ const Auth = () => {
     </Suspense>
   );
 };
+
 export default Auth;

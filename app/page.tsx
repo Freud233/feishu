@@ -3,12 +3,12 @@ import { createTask, getTaskList, patchTask } from '@/actions';
 import { createClockifyProject, getAllProject } from '@/actions/clockify';
 import Header from '@/components/Header';
 import MyTimer from '@/components/MyTimer';
-import { hexToRgbInt32 } from '@/lib';
+import { CODE, LARK_TASK_ASSIGNEE_ID } from '@/constants';
+import { hasTokenExpired, hexToRgbInt32 } from '@/lib';
 import { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore } from '@/store';
 import { ILarkTask } from '@/type';
 import { IClockifyProject } from '@/type/store';
 import {
-  addToast,
   Button,
   Checkbox,
   Input,
@@ -21,101 +21,138 @@ import {
   SelectItem,
   useDisclosure,
 } from '@heroui/react';
-import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+
+/**
+ * 项目下拉框提到组件外部。
+ * 原实现定义在 Home 内部，父组件每次重渲染都会生成新的组件类型，
+ * 导致 Select 被卸载重挂载、选中态丢失，并带来无意义的渲染开销。
+ */
+const ProjectRender = ({
+  data,
+  projectId,
+  onSelect,
+}: {
+  data: IClockifyProject[];
+  projectId: string;
+  onSelect: (id: string) => void;
+}) => (
+  <Select
+    label="项目"
+    color="success"
+    selectedKeys={[projectId]}
+    className="max-w-xl"
+    onSelectionChange={(e) => onSelect(e.currentKey?.toString() ?? '')}
+  >
+    {data.map((item) => (
+      <SelectItem key={item.id}>{item.name}</SelectItem>
+    ))}
+  </Select>
+);
+
 export default function Home() {
-  const { workspaceId, clockifyUserId, projectData, updateProjectData, updateProjectId, projectId } =
-    useClockifyStore();
-  const { token, isTokenExpired, tokenExpiredAt } = useLarkStore()
+  const { workspaceId, projectData, updateProjectData, updateProjectId, projectId } = useClockifyStore();
+  const { token, tokenExpiredAt } = useLarkStore();
   const [color, setColor] = useState(0);
   const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
   const [projectName, setProjectName] = useState('');
   const { title, updateTitle } = useCalendarStore();
   const { description } = useCalendarDescriptionStore();
-  const [taskList, setTaskList] = useState<ILarkTask[]>()
-  const [task, setTask] = useState<string>()
-  const onGetTaskHandle = async () => {
-    if (!token || isTokenExpired) return
-    console.log("🚀 ~ getTaskListData ~ isTokenExpired:", dayjs(tokenExpiredAt).format())
-    const { data, code, msg } = await getTaskList(token)
-    console.log("🚀 ~ getTaskListData ~ msg:", msg)
-    if (code === 0) {
-      if (data.items) {
-        console.log("🚀 ~ getTaskListData ~ data:", data)
-        setTaskList(data.items)
+  const [taskList, setTaskList] = useState<ILarkTask[]>([]);
+  const [task, setTask] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const onGetTaskHandle = useCallback(async () => {
+    if (!token || hasTokenExpired(tokenExpiredAt)) return;
+    setIsLoading(true);
+    try {
+      const { data, code, msg } = await getTaskList(token);
+      if (code === CODE.OK) {
+        setTaskList(data?.items ?? []);
+      } else {
+        toast.warning(msg || '获取任务列表失败');
       }
+    } finally {
+      setIsLoading(false);
     }
-  }
-  const onGetAllProjectHandle = async () => {
+  }, [token, tokenExpiredAt]);
+
+  const onGetAllProjectHandle = useCallback(async () => {
     if (!workspaceId) return;
-    const data = await getAllProject(workspaceId);
-    console.log('🚀 ~ onGetAllProjectHandle ~ data:', data);
-    updateProjectData(data);
-  };
-
-  const onPatchTaskHandle = async (task: ILarkTask) => {
-    if (!token || !task) return
-    const newTask = { ...task, completed_at: dayjs() + '', status: task.status === 'todo' ? 'done' : 'todo' }
-    const { code, msg } = await patchTask(newTask, token)
-    console.log("🚀 ~ onPatchTaskHandle ~ msg:", msg)
-    if (code === 0) {
-      addToast({
-        // TODO 换成更美观的动画效果
-        title: '已完成任务',
-      })
-      onGetTaskHandle()
+    const { code, data, msg } = await getAllProject(workspaceId);
+    if (code === CODE.OK) {
+      updateProjectData(data ?? []);
+    } else {
+      toast.warning(msg || '获取项目列表失败');
     }
-  }
+  }, [workspaceId, updateProjectData]);
 
-  const onCreateTaskHandle = async () => {
-    if (!token || isTokenExpired || !task) return
-    // id 成员id, role 负责人 assignee 关注人 follower
-    const data = await createTask({ summary: task, members: [{ id: 'ou_a94f013df62163fd13eca73b7ce50a62', role: 'assignee', type: 'user' }] }, token)
-    console.log("🚀 ~ onCreateTaskHandle ~ data:", data)
-  }
+  // 依赖补全：token / 过期时间变化后会重新拉取任务，不再依赖陈旧的闭包
   useEffect(() => {
     onGetAllProjectHandle();
-    if (token && (tokenExpiredAt > dayjs().unix())) {
-      console.log('token 没有过期');
-      onGetTaskHandle()
+    onGetTaskHandle();
+  }, [onGetAllProjectHandle, onGetTaskHandle]);
+
+  const onPatchTaskHandle = async (item: ILarkTask) => {
+    if (!token || hasTokenExpired(tokenExpiredAt)) {
+      toast.warning('登录已过期，请重新登录');
+      return;
     }
-  }, [clockifyUserId]);
-  const ProjectRender = ({ data }: { data: IClockifyProject[] }) => {
-    return (
-      <Select
-        label="项目"
-        color="success"
-        selectedKeys={[projectId]}
-        className="max-w-xl"
-        onSelectionChange={(e) => {
-          console.log(e.currentKey);
-          const colorArr = projectData.filter((i: { id: string | undefined; color: string | ''; }) => {
-            if (i.id == e.currentKey) {
-              return i.color;
-            }
-          });
-          setColor(hexToRgbInt32(colorArr[0]?.color) || 0);
-          updateProjectId(e.currentKey || '');
-        }}
-      >
-        {data.map((item) => (
-          <SelectItem key={item.id}>{item.name}</SelectItem>
-        ))}
-      </Select>
+    const nextTask = { ...item, status: item.status === 'todo' ? 'done' : 'todo' };
+    const { code, msg } = await patchTask(nextTask, token);
+    if (code === CODE.OK) {
+      toast.success('任务状态已更新');
+      await onGetTaskHandle();
+    } else {
+      toast.warning(msg || '更新任务失败');
+    }
+  };
+
+  const onCreateTaskHandle = async () => {
+    if (!token || hasTokenExpired(tokenExpiredAt)) {
+      toast.warning('登录已过期，请重新登录');
+      return;
+    }
+    if (!task.trim()) {
+      toast.warning('请输入任务名称');
+      return;
+    }
+    const { code, msg } = await createTask(
+      {
+        summary: task.trim(),
+        members: [{ id: LARK_TASK_ASSIGNEE_ID, role: 'assignee', type: 'user' }],
+      },
+      token,
     );
+    if (code === CODE.OK) {
+      toast.success('创建任务成功');
+      setTask('');
+      await onGetTaskHandle();
+    } else {
+      toast.warning(msg || '创建任务失败');
+    }
+  };
+
+  const onSelectProject = (id: string) => {
+    // 原实现用 filter 取颜色（回调里 return i.color 当成布尔用），再取可能不存在的 [0]
+    const selected = projectData.find((item) => item.id === id);
+    setColor(hexToRgbInt32(selected?.color));
+    updateProjectId(id);
   };
 
   const addClockifyProject = async () => {
-    console.log(projectName, 'projectName');
-    if (!projectName || !projectName.length) return toast.warning('请输入正确名字');
-    if (projectData.some((item: { name: string; }) => item.name == projectName)) return toast.error('项目名已存在');
-    const res = await createClockifyProject(workspaceId, projectName);
-    if (res) {
+    if (!projectName.trim()) {
+      toast.warning('请输入正确名字');
+      return;
+    }
+    const { code, msg } = await createClockifyProject(workspaceId, projectName);
+    if (code === CODE.OK) {
       toast.success('增加项目成功');
+      setProjectName('');
       await onGetAllProjectHandle();
     } else {
-      toast.warning('添加项目错误');
+      toast.warning(msg || '添加项目错误');
     }
     onClose();
   };
@@ -125,43 +162,50 @@ export default function Home() {
       <Header></Header>
       <div className="flex flex-col gap-4 p-4 md:flex-row">
         <div className="flex flex-col gap-2 rounded-xl">
-          {projectData && projectData.length > 0 && (
-            <div className="flex items-center gap-2 h-full">
-              <ProjectRender data={projectData} />
+          {projectData.length > 0 && (
+            <div className="flex h-full items-center gap-2">
+              <ProjectRender data={projectData} projectId={projectId} onSelect={onSelectProject} />
               <Button className="bg-jade-100  h-full" onPress={onOpen}>
                 添加
               </Button>
             </div>
           )}
           <datalist id="project">
-            {description &&
-              description.map((item: string) => (
-                <option value={item} key={item}>
-                  {item}
-                </option>
-              ))}
+            {description.map((item: string) => (
+              <option value={item} key={item}>
+                {item}
+              </option>
+            ))}
           </datalist>
           <Input
             color="primary"
             value={title}
             placeholder="输入标题"
-            onValueChange={(e) => updateTitle(e)}
+            onValueChange={updateTitle}
             list="project"
           />
           <MyTimer color={color} />
         </div>
         {/* 未完成任务 */}
-        <div className='flex flex-col gap-4'>
-          <div className='flex gap-2'>
-            <Input isRequired placeholder='输入任务名称' color='secondary' onChange={e => {
-              if (!e.target.value) return
-              setTask(e.target.value)
-            }} isClearable />
-            <Button color='success' onPress={onCreateTaskHandle}>确定</Button>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-2">
+            <Input
+              isRequired
+              placeholder="输入任务名称"
+              color="secondary"
+              value={task}
+              onValueChange={setTask}
+              isClearable
+            />
+            <Button color="success" onPress={onCreateTaskHandle} isLoading={isLoading}>
+              确定
+            </Button>
           </div>
-          {taskList && taskList.map(item => {
-            return <Checkbox key={item.task_id} onChange={() => onPatchTaskHandle(item)}>{item.summary}</Checkbox>
-          })}
+          {taskList.map((item) => (
+            <Checkbox key={item.task_id} onChange={() => onPatchTaskHandle(item)}>
+              {item.summary}
+            </Checkbox>
+          ))}
         </div>
       </div>
       {/* 新增项目modal */}
@@ -173,7 +217,7 @@ export default function Home() {
               color="success"
               placeholder="输入项目名"
               value={projectName}
-              onValueChange={(e) => setProjectName(e)}
+              onValueChange={setProjectName}
             />
           </ModalBody>
           <ModalFooter>
