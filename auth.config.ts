@@ -1,7 +1,7 @@
-import axios from 'axios';
 import { NextAuthConfig } from 'next-auth';
 import { OAuthConfig } from 'next-auth/providers';
 import GitHub from 'next-auth/providers/github';
+
 const Lark = () => {
   return {
     id: 'lark',
@@ -14,7 +14,6 @@ const Lark = () => {
       params: {
         redirect_uri: process.env.AUTH_LARK_REDIRECT_URL || '',
         client_id: process.env.AUTH_LARK_ID || '',
-        client_secret: process.env.AUTH_LARK_SECRET || '',
         scope: 'calendar:calendar',
         response_type: 'code',
       },
@@ -22,56 +21,55 @@ const Lark = () => {
     token: {
       url: 'https://open.feishu.cn/open-apis/authen/v2/oauth/token',
       async request(context: any) {
-        console.log('🚀 ~ request ~ context:', context);
         const { code, provider, pkce_code_verifier } = context;
-        const data = {
-          grant_type: 'authorization_code',
-          client_id: process.env.AUTH_LARK_ID || '',
-          client_secret: process.env.AUTH_LARK_SECRET || '',
-          code,
-          code_verifier: pkce_code_verifier,
-        };
-        const res = await axios.post(provider.token?.url, data, {
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-          },
+        // 用原生 fetch 代替 axios：auth.config 会被 middleware 引入，
+        // axios 依赖 setImmediate / process.nextTick，在 Edge Runtime 不可用且会撑大 middleware 体积
+        const response = await fetch(provider.token?.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
+          body: JSON.stringify({
+            grant_type: 'authorization_code',
+            client_id: process.env.AUTH_LARK_ID || '',
+            client_secret: process.env.AUTH_LARK_SECRET || '',
+            code,
+            code_verifier: pkce_code_verifier,
+          }),
         });
-        return {
-          access_token: res.data.access_token,
-        };
+        if (!response.ok) throw new Error(`Lark token request failed: ${response.status}`);
+        const result = await response.json();
+        return { access_token: result.access_token };
       },
     },
     userinfo: {
       url: 'https://open.feishu.cn/open-apis/authen/v1/user_info',
       async request({ tokens, provider }: any) {
-        // 使用 tokens 获取用户信息
-        const response = await axios.get(provider.userinfo?.url, {
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-          },
+        const response = await fetch(provider.userinfo?.url, {
+          headers: { Authorization: `Bearer ${tokens.access_token}` },
         });
-        console.log('🚀 ~ request ~ response:', response);
-        return response.data.data;
+        if (!response.ok) throw new Error(`Lark userinfo request failed: ${response.status}`);
+        const result = await response.json();
+        return result.data;
       },
     },
     profile(profile) {
-      console.log('🚀 ~ profile ~ profile:', profile);
       return {
-        id: profile.user_id, // 飞书的 user_id
-        name: profile.name, // 飞书的用户名
-        email: profile.email, // 如果有邮箱字段
-        image: profile.avatar_url, // 用户头像
+        id: profile.user_id,
+        name: profile.name,
+        email: profile.email,
+        image: profile.avatar_url,
       };
     },
     checks: ['pkce', 'state'],
   } as OAuthConfig<any>;
 };
+
 export default {
   providers: [GitHub, Lark],
-  debug: true,
+  // debug 会把完整的 OAuth 上下文写进日志，仅本地开发开启
+  debug: process.env.NODE_ENV === 'development',
   logger: {
-    error(err) {
-      console.log('🚀 ~ error ~ err:', err);
+    error(error) {
+      console.error('[auth]', error);
     },
   },
 } satisfies NextAuthConfig;

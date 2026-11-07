@@ -1,10 +1,8 @@
-'use client'
+'use client';
 
-import { HeroUIProvider, ToastProvider } from '@heroui/react'
+import type { ReactNode } from 'react';
+import { ThemeProvider } from '@/components/ui/theme';
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>
-    <ToastProvider />
-    {children}
-  </HeroUIProvider>
+export function Providers({ children }: { children: ReactNode }) {
+  return <ThemeProvider>{children}</ThemeProvider>;
 }

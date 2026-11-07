@@ -2,3 +2,801 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   Material Design 3 — Design Tokens
+   色彩角色 / 排版比例 / 形状 / 高度 / 状态层 / 动效
+   亮色由 :root 提供，暗色由 <html class="dark"> 覆盖（跟随系统或手动切换）。
+   ========================================================================== */
+
+@layer base {
+  :root {
+    color-scheme: light;
+
+    /* ---- Color roles: light ---- */
+    --md-primary: #006c4c;
+    --md-on-primary: #ffffff;
+    --md-primary-container: #8df7c6;
+    --md-on-primary-container: #002114;
+
+    --md-secondary: #4d6357;
+    --md-on-secondary: #ffffff;
+    --md-secondary-container: #cfe9d8;
+    --md-on-secondary-container: #0a2017;
+
+    --md-tertiary: #3d6373;
+    --md-on-tertiary: #ffffff;
+    --md-tertiary-container: #c1e8fa;
+    --md-on-tertiary-container: #001f2a;
+
+    --md-error: #ba1a1a;
+    --md-on-error: #ffffff;
+    --md-error-container: #ffdad6;
+    --md-on-error-container: #410002;
+
+    --md-surface: #fbfdf9;
+    --md-surface-dim: #d6dbd5;
+    --md-surface-bright: #fbfdf9;
+    --md-surface-container-lowest: #ffffff;
+    --md-surface-container-low: #f5f9f4;
+    --md-surface-container: #eff3ee;
+    --md-surface-container-high: #e9eee8;
+    --md-surface-container-highest: #e3e8e2;
+
+    --md-on-surface: #191c1a;
+    --md-on-surface-variant: #404943;
+    --md-outline: #707973;
+    --md-outline-variant: #c0c9c1;
+
+    --md-inverse-surface: #2d312f;
+    --md-inverse-on-surface: #eff3ee;
+    --md-inverse-primary: #6fdbac;
+    --md-scrim: #000000;
+
+    /* ---- Elevation (MD3 level 1/2/3) ---- */
+    --md-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+    --md-elevation-2: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+    --md-elevation-3: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px 0 rgb(0 0 0 / 0.3);
+
+    /* ---- State layer opacity ---- */
+    --md-state-hover: 0.08;
+    --md-state-focus: 0.1;
+    --md-state-pressed: 0.12;
+
+    /* ---- Motion: emphasized easing ---- */
+    --md-easing: cubic-bezier(0.2, 0, 0, 1);
+    --md-duration-short: 150ms;
+    --md-duration-medium: 250ms;
+    --md-duration-long: 400ms;
+
+    /* ---- Type / shape ---- */
+    --md-font: 'Roboto', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+      'Microsoft YaHei', sans-serif;
+
+    /* 兼容旧配置里引用的两个变量 */
+    --background: var(--md-surface);
+    --foreground: var(--md-on-surface);
+  }
+
+  .dark {
+    color-scheme: dark;
+
+    --md-primary: #6fdbac;
+    --md-on-primary: #003822;
+    --md-primary-container: #005138;
+    --md-on-primary-container: #8df7c6;
+
+    --md-secondary: #b3ccbb;
+    --md-on-secondary: #1f3529;
+    --md-secondary-container: #364b3f;
+    --md-on-secondary-container: #cfe9d8;
+
+    --md-tertiary: #a5ccdf;
+    --md-on-tertiary: #073543;
+    --md-tertiary-container: #244b5a;
+    --md-on-tertiary-container: #c1e8fa;
+
+    --md-error: #ffb4ab;
+    --md-on-error: #690005;
+    --md-error-container: #93000a;
+    --md-on-error-container: #ffdad6;
+
+    --md-surface: #191c1a;
+    --md-surface-dim: #111412;
+    --md-surface-bright: #383d39;
+    --md-surface-container-lowest: #0e100f;
+    --md-surface-container-low: #191c1a;
+    --md-surface-container: #1d211f;
+    --md-surface-container-high: #272b29;
+    --md-surface-container-highest: #323633;
+
+    --md-on-surface: #e3e8e2;
+    --md-on-surface-variant: #c0c9c1;
+    --md-outline: #8a938c;
+    --md-outline-variant: #404943;
+
+    --md-inverse-surface: #e3e8e2;
+    --md-inverse-on-surface: #2d312f;
+    --md-inverse-primary: #006c4c;
+    --md-scrim: #000000;
+
+    --md-elevation-1: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 1px 3px 1px rgb(0 0 0 / 0.3);
+    --md-elevation-2: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 2px 6px 2px rgb(0 0 0 / 0.3);
+    --md-elevation-3: 0 4px 8px 3px rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.4);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100dvh;
+    background: var(--md-surface);
+    color: var(--md-on-surface);
+    font-family: var(--md-font);
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color var(--md-duration-medium) var(--md-easing),
+      color var(--md-duration-medium) var(--md-easing);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--md-primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--md-outline-variant);
+    border: 2px solid var(--md-surface);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     Typography scale (MD3)
+     ------------------------------------------------------------------------ */
+  .md-type-display {
+    font-size: 57px;
+    line-height: 64px;
+    font-weight: 400;
+    letter-spacing: -0.25px;
+  }
+  .md-type-headline-lg {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .md-type-headline-sm {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+  .md-type-title-lg {
+    font-size: 22px;
+    line-height: 28px;
+    font-weight: 400;
+  }
+  .md-type-title-md {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 500;
+    letter-spacing: 0.15px;
+  }
+  .md-type-title-sm {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+  }
+  .md-type-body-lg {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+  }
+  .md-type-body-md {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+  }
+  .md-type-body-sm {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    letter-spacing: 0.4px;
+  }
+  .md-type-label-lg {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+  }
+  .md-type-label-md {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  /* ------------------------------------------------------------------------
+     State layer — hover 8% / focus 10% / pressed 12%
+     ------------------------------------------------------------------------ */
+  .md-state {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .md-state::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--md-state-color, currentColor);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--md-duration-short) var(--md-easing);
+  }
+  @media (hover: hover) {
+    .md-state:hover::after {
+      opacity: var(--md-state-hover);
+    }
+  }
+  .md-state:focus-visible::after {
+    opacity: var(--md-state-focus);
+  }
+  .md-state:active::after {
+    opacity: var(--md-state-pressed);
+  }
+
+  /* ------------------------------------------------------------------------
+     Buttons (MD3 common buttons: filled / tonal / outlined / text)
+     ------------------------------------------------------------------------ */
+  .md-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--md-primary);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0.1px;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    --md-state-color: currentColor;
+    transition: box-shadow var(--md-duration-short) var(--md-easing),
+      background-color var(--md-duration-short) var(--md-easing),
+      color var(--md-duration-short) var(--md-easing);
+  }
+  .md-btn:disabled {
+    color: var(--md-on-surface);
+    opacity: 0.38;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .md-btn:disabled::after {
+    display: none;
+  }
+  .md-btn--filled {
+    background: var(--md-primary);
+    color: var(--md-on-primary);
+  }
+  .md-btn--filled:not(:disabled):hover {
+    box-shadow: var(--md-elevation-1);
+  }
+  .md-btn--tonal {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+  .md-btn--tonal:not(:disabled):hover {
+    box-shadow: var(--md-elevation-1);
+  }
+  .md-btn--outlined {
+    border: 1px solid var(--md-outline);
+    color: var(--md-primary);
+  }
+  .md-btn--text {
+    padding: 0 12px;
+  }
+  .md-btn--danger {
+    background: var(--md-error-container);
+    color: var(--md-on-error-container);
+  }
+  .md-btn--sm {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+  .md-btn__icon {
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .md-icon-btn {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--md-on-surface-variant);
+    cursor: pointer;
+    --md-state-color: currentColor;
+  }
+  .md-icon-btn--tonal {
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+  .md-icon-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+
+  .md-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: md-spin 800ms linear infinite;
+  }
+  .md-spinner--lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+  @keyframes md-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Cards / surfaces
+     ------------------------------------------------------------------------ */
+  .md-card {
+    background: var(--md-surface-container-low);
+    color: var(--md-on-surface);
+    border-radius: 16px;
+    --md-field-bg: var(--md-surface-container-low);
+  }
+  .md-card--filled {
+    background: var(--md-surface-container-highest);
+    --md-field-bg: var(--md-surface-container-highest);
+  }
+  .md-card--outlined {
+    background: var(--md-surface);
+    border: 1px solid var(--md-outline-variant);
+    --md-field-bg: var(--md-surface);
+  }
+  .md-card--elevated {
+    background: var(--md-surface-container-low);
+    box-shadow: var(--md-elevation-1);
+  }
+  .md-card--hero {
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    --md-field-bg: var(--md-primary-container);
+  }
+  /* hero 容器上的描边按钮 / 输入 chip 使用容器前景色，保证足够对比度 */
+  .md-card--hero .md-btn--outlined {
+    color: var(--md-on-primary-container);
+    border-color: var(--md-on-primary-container);
+  }
+  .md-card--hero .md-chip {
+    color: var(--md-on-primary-container);
+    border-color: var(--md-on-primary-container);
+  }
+  .md-divider {
+    height: 1px;
+    background: var(--md-outline-variant);
+  }
+
+  /* ------------------------------------------------------------------------
+     Text fields (MD3 filled variant)
+     ------------------------------------------------------------------------ */
+  .md-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .md-field__box {
+    position: relative;
+    display: flex;
+    min-height: 56px;
+    align-items: flex-end;
+    background: var(--md-field-bg, var(--md-surface-container-highest));
+    border-bottom: 1px solid var(--md-on-surface-variant);
+    border-radius: 4px 4px 0 0;
+    transition: border-color var(--md-duration-short) var(--md-easing),
+      background-color var(--md-duration-short) var(--md-easing);
+  }
+  .md-field__box:focus-within {
+    border-bottom: 2px solid var(--md-primary);
+  }
+  .md-field__box:hover:not(:focus-within) {
+    border-bottom-color: var(--md-on-surface);
+  }
+  .md-field__input,
+  .md-field__select {
+    width: 100%;
+    min-width: 0;
+    height: 48px;
+    padding: 0 16px 6px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--md-on-surface);
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.5px;
+    appearance: none;
+  }
+  .md-field__input::placeholder {
+    color: transparent;
+  }
+  .md-field__label {
+    position: absolute;
+    top: 18px;
+    left: 16px;
+    transform-origin: left top;
+    color: var(--md-on-surface-variant);
+    font-size: 16px;
+    line-height: 24px;
+    pointer-events: none;
+    transition: transform var(--md-duration-short) var(--md-easing),
+      color var(--md-duration-short) var(--md-easing);
+  }
+  .md-field__input:focus ~ .md-field__label,
+  .md-field__input:not(:placeholder-shown) ~ .md-field__label,
+  .md-field--static .md-field__label {
+    transform: translateY(-12px) scale(0.75);
+  }
+  .md-field__input:focus ~ .md-field__label,
+  .md-field__select:focus ~ .md-field__label {
+    color: var(--md-primary);
+  }
+  .md-field__select {
+    cursor: pointer;
+    padding-right: 40px;
+  }
+  .md-field__select option {
+    background: var(--md-surface-container-high);
+    color: var(--md-on-surface);
+  }
+  .md-field__chevron {
+    position: absolute;
+    right: 14px;
+    bottom: 15px;
+    width: 20px;
+    height: 20px;
+    color: var(--md-on-surface-variant);
+    pointer-events: none;
+  }
+  .md-field__clear {
+    position: absolute;
+    right: 8px;
+    bottom: 10px;
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--md-on-surface-variant);
+    cursor: pointer;
+  }
+  .md-field__supporting {
+    padding: 0 16px;
+    color: var(--md-on-surface-variant);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  /* ------------------------------------------------------------------------
+     Checkbox (18dp, 2dp corner, primary when checked)
+     ------------------------------------------------------------------------ */
+  .md-checkbox {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    gap: 16px;
+    padding: 0 16px;
+    border-radius: 8px;
+    color: var(--md-on-surface);
+    cursor: pointer;
+    --md-state-color: var(--md-on-surface);
+    transition: background-color var(--md-duration-short) var(--md-easing);
+  }
+  .md-checkbox__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .md-checkbox__box {
+    position: relative;
+    display: inline-flex;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--md-on-surface-variant);
+    border-radius: 2px;
+    transition: background-color var(--md-duration-short) var(--md-easing),
+      border-color var(--md-duration-short) var(--md-easing);
+  }
+  .md-checkbox__box::after {
+    content: '';
+    width: 5px;
+    height: 10px;
+    margin-top: -3px;
+    border: solid var(--md-on-primary);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+    transition: transform var(--md-duration-short) var(--md-easing);
+  }
+  .md-checkbox__input:checked + .md-checkbox__box {
+    background: var(--md-primary);
+    border-color: var(--md-primary);
+  }
+  .md-checkbox__input:checked + .md-checkbox__box::after {
+    transform: rotate(45deg) scale(1);
+  }
+  .md-checkbox__input:focus-visible + .md-checkbox__box {
+    outline: 3px solid var(--md-primary);
+    outline-offset: 3px;
+  }
+  .md-checkbox__label {
+    min-width: 0;
+    flex: 1;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.5px;
+    overflow-wrap: anywhere;
+  }
+  .md-checkbox--done .md-checkbox__label {
+    color: var(--md-on-surface-variant);
+    text-decoration: line-through;
+  }
+
+  /* ------------------------------------------------------------------------
+     Chips / linear progress
+     ------------------------------------------------------------------------ */
+  .md-chip {
+    display: inline-flex;
+    height: 32px;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    border: 1px solid var(--md-outline);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--md-on-surface-variant);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .md-chip--assist {
+    border-color: transparent;
+    background: var(--md-secondary-container);
+    color: var(--md-on-secondary-container);
+  }
+  .md-chip--dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .md-progress {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--md-surface-container-highest);
+  }
+  .md-progress__indicator {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--md-primary);
+    transition: width var(--md-duration-long) var(--md-easing);
+  }
+  .md-card--hero .md-progress {
+    background: rgb(0 33 20 / 0.12);
+  }
+  .dark .md-card--hero .md-progress {
+    background: rgb(141 247 198 / 0.18);
+  }
+  .md-card--hero .md-progress__indicator {
+    background: var(--md-on-primary-container);
+  }
+
+  /* ------------------------------------------------------------------------
+     Top app bar / dialog / list
+     ------------------------------------------------------------------------ */
+  .md-appbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    gap: 16px;
+    padding: 0 24px;
+    background: var(--md-surface);
+    border-bottom: 1px solid var(--md-outline-variant);
+    transition: background-color var(--md-duration-medium) var(--md-easing);
+  }
+  .md-avatar {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--md-primary-container);
+    color: var(--md-on-primary-container);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .md-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .md-avatar--lg {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+  .md-avatar--lg svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .md-dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgb(0 0 0 / 0.32);
+    animation: md-fade-in var(--md-duration-medium) var(--md-easing);
+  }
+  .md-dialog {
+    width: min(100%, 420px);
+    padding: 24px;
+    border-radius: 28px;
+    background: var(--md-surface-container-high);
+    color: var(--md-on-surface);
+    box-shadow: var(--md-elevation-3);
+    animation: md-dialog-in var(--md-duration-medium) var(--md-easing);
+    --md-field-bg: var(--md-surface-container-high);
+  }
+  .md-dialog__headline {
+    margin: 0 0 16px;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 400;
+  }
+  .md-dialog__body {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--md-on-surface-variant);
+  }
+  .md-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+  }
+  @keyframes md-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes md-dialog-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(12px);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Snackbar — react-toastify 覆盖为 MD3 样式
+     ------------------------------------------------------------------------ */
+  .Toastify__toast {
+    min-height: 48px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--md-inverse-surface) !important;
+    color: var(--md-inverse-on-surface) !important;
+    box-shadow: var(--md-elevation-3) !important;
+    font-family: var(--md-font) !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    letter-spacing: 0.25px;
+  }
+  .Toastify__toast--success,
+  .Toastify__toast--warning,
+  .Toastify__toast--error,
+  .Toastify__toast--info {
+    background: var(--md-inverse-surface) !important;
+    color: var(--md-inverse-on-surface) !important;
+  }
+  .Toastify__toast-body {
+    margin: 0;
+    padding: 0;
+  }
+  .Toastify__toast-icon {
+    display: none;
+  }
+  .Toastify__progress-bar {
+    display: none;
+  }
+  .Toastify__close-button {
+    color: var(--md-inverse-primary) !important;
+    opacity: 1;
+  }
+  .Toastify__toast-container {
+    padding: 0 24px 24px 0;
+  }
+}
+
+@layer utilities {
+  .md-tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+  .md-elev-1 {
+    box-shadow: var(--md-elevation-1);
+  }
+  .md-elev-2 {
+    box-shadow: var(--md-elevation-2);
+  }
+  .md-surface-tint {
+    background: var(--md-surface-container);
+  }
+}

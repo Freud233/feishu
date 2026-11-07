@@ -9,8 +9,13 @@ import {
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+
+// devtools 只在开发环境启用，避免生产环境每次状态变更都走扩展序列化
+const DEVTOOLS_ENABLED = process.env.NODE_ENV === 'development';
+
 /**
- * 飞书 token 日历ID 数据
+ * 飞书 token / 日历 ID 数据
+ * 注意：tokenExpiredAt 统一为毫秒时间戳（Date.now() 体系）
  * */
 const useLarkStore = create<ILarkStore>()(
   devtools(
@@ -26,7 +31,15 @@ const useLarkStore = create<ILarkStore>()(
             set((state) => {
               state.token = newToken;
             }),
-          removeToken: () => set({ token: '' }),
+          // 登出时清空全部关联状态，避免残留 refreshToken / 过期时间造成误判
+          removeToken: () =>
+            set((state) => {
+              state.token = '';
+              state.refreshToken = '';
+              state.calendarId = '';
+              state.tokenExpiredAt = 0;
+              state.isTokenExpired = true;
+            }),
           updateCalendarId: (newId: string) =>
             set((state) => {
               state.calendarId = newId;
@@ -38,8 +51,7 @@ const useLarkStore = create<ILarkStore>()(
             }),
           updateIsTokenExpired: () =>
             set((state) => {
-              const time = new Date().getTime();
-              state.isTokenExpired = state.tokenExpiredAt < time;
+              state.isTokenExpired = Date.now() >= state.tokenExpiredAt;
             }),
           updateTokenExpiredAt: (newTime: number) =>
             set((state) => {
@@ -49,13 +61,12 @@ const useLarkStore = create<ILarkStore>()(
         { name: 'lark-store', storage: createJSONStorage(() => localStorage) },
       ),
     ),
-    {
-      name: 'lark',
-    },
+    { name: 'lark', enabled: DEVTOOLS_ENABLED },
   ),
 );
+
 /**
- * Clockify相关数据
+ * Clockify 相关数据
  * */
 const useClockifyStore = create<IClockifyStore>()(
   devtools(
@@ -90,9 +101,7 @@ const useClockifyStore = create<IClockifyStore>()(
         },
       ),
     ),
-    {
-      name: 'clockify',
-    },
+    { name: 'clockify', enabled: DEVTOOLS_ENABLED },
   ),
 );
 
@@ -126,9 +135,7 @@ const useUserInfoStore = create<IUserInfo>()(
         },
       ),
     ),
-    {
-      name: 'userInfo',
-    },
+    { name: 'userInfo', enabled: DEVTOOLS_ENABLED },
   ),
 );
 
@@ -149,6 +156,7 @@ const useCalendarStore = create<ICalendarStore>()(
         },
       ),
     ),
+    { enabled: DEVTOOLS_ENABLED },
   ),
 );
 
@@ -175,7 +183,8 @@ const useCalendarDescriptionStore = create<ICalendarDescriptionStore>()(
         { name: 'calendar-title-array', storage: createJSONStorage(() => localStorage) },
       ),
     ),
+    { enabled: DEVTOOLS_ENABLED },
   ),
 );
-export { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore, useUserInfoStore };
 
+export { useCalendarDescriptionStore, useCalendarStore, useClockifyStore, useLarkStore, useUserInfoStore };
